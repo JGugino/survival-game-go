@@ -14,6 +14,10 @@ const (
 	WINDOW_HEIGHT = 800
 	WINDOW_TITLE  = "Survival Game - Raylib Go"
 	TARGET_FPS    = 60
+
+	DEFAULT_CELL_SIZE  = 40
+	DEFAULT_MAP_WIDTH  = 64
+	DEFAULT_MAP_HEIGHT = 64
 )
 
 func main() {
@@ -23,25 +27,25 @@ func main() {
 	rl.SetTargetFPS(TARGET_FPS)
 
 	worldGenerator := world.WorldGenerator{
-		CellSize:  40,
-		MapWidth:  64,
-		MapHeight: 64,
+		CellSize:  DEFAULT_CELL_SIZE,
+		MapWidth:  DEFAULT_MAP_WIDTH,
+		MapHeight: DEFAULT_MAP_HEIGHT,
 		ObjectManager: world.Objects{
-			Objs: make(map[uuid.UUID]world.Object, 0),
+			Objs: make(map[uuid.UUID]*world.Object, 0),
 		},
 	}
 
-	player := entities.Player{Position: rl.Vector2{X: worldGenerator.SpawnPoint.X, Y: worldGenerator.SpawnPoint.Y}, Health: 100, Speed: 2, Width: 40, Height: 40, Direction: entities.UP, Moving: false}
+	player := entities.Player{Position: rl.Vector2{X: worldGenerator.SpawnPoint.X, Y: worldGenerator.SpawnPoint.Y}, Health: 100, Speed: 2, Width: DEFAULT_CELL_SIZE, Height: DEFAULT_CELL_SIZE, Direction: entities.UP, Moving: false}
 
 	mainCamera := rl.Camera2D{Offset: rl.Vector2{X: WINDOW_WIDTH / 2, Y: WINDOW_HEIGHT / 2}, Target: player.Position, Rotation: 0, Zoom: 1.2}
 
 	inv := handlers.Inventory{
 		HotbarSize:         9,
-		CellSize:           40,
+		CellSize:           DEFAULT_CELL_SIZE,
 		Visible:            false,
 		SelectedHotbarSlot: 0,
 		Hovering:           false,
-		MainInventory:      utils.Container{Width: 9, Height: 4, ScreenWidth: 9 * 40, ScreenHeight: 4 * 40},
+		MainInventory:      utils.Container{Width: 9, Height: 4, ScreenWidth: 9 * DEFAULT_CELL_SIZE, ScreenHeight: 4 * DEFAULT_CELL_SIZE},
 		Positioning: handlers.InventoryPosition{
 			InventoryYOffset:     40,
 			InventoryXPadding:    10,

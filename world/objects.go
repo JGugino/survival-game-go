@@ -9,7 +9,7 @@ import (
 )
 
 type Objects struct {
-	Objs       map[uuid.UUID]Object
+	Objs       map[uuid.UUID]*Object
 	Width      int
 	Height     int
 	CellSize   int
@@ -46,7 +46,7 @@ func (o *Objects) CreateNewObject(object ObjectId, position rl.Vector2, health i
 
 	o.ObjectGrid[int(position.X)][int(position.Y)] = int(object)
 
-	o.Objs[objId] = obj
+	o.Objs[objId] = &obj
 
 	return objId
 }
@@ -57,6 +57,22 @@ func (o *Objects) RemoveObject(objId uuid.UUID) {
 	delete(o.Objs, objId)
 }
 
+func (o *Objects) DamageObject(objId uuid.UUID, damage int) error {
+	obj, ok := o.Objs[objId]
+	if !ok {
+		return errors.New("no-object")
+	}
+
+	obj.Health -= damage
+
+	if obj.Health <= 0 {
+		o.RemoveObject(objId)
+		return nil
+	}
+
+	return nil
+}
+
 func (o *Objects) GetObjectAtWorldPosition(position rl.Vector2) (uuid.UUID, *Object, error) {
 	//Clicked position on the object grid
 	gridX := int(position.X) / o.CellSize
@@ -65,7 +81,7 @@ func (o *Objects) GetObjectAtWorldPosition(position rl.Vector2) (uuid.UUID, *Obj
 	//Goes through all of the objects to
 	for _, x := range o.Objs {
 		if int(x.Position.X) == gridX && int(x.Position.Y) == gridY {
-			return x.Id, &x, nil
+			return x.Id, x, nil
 		}
 	}
 

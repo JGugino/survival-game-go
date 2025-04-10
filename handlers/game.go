@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"math"
 
 	"github.com/JGugino/survival-game-go/entities"
@@ -58,7 +57,7 @@ func (g *Game) HandleInput() {
 
 		if obj.Mineable {
 			if activeHotbarSlotItem.MineLevel >= obj.Level {
-				fmt.Printf("Can mine %s\n", obj.DroppedItem.Name)
+				g.Generator.ObjectManager.DamageObject(obj.Id, activeHotbarSlotItem.MineDamage)
 			}
 		}
 

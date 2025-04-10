@@ -43,7 +43,7 @@ func (g *WorldGenerator) InitWorldGrid() {
 						return
 					}
 
-					g.ObjectManager.CreateNewObject(ROCK, rl.Vector2{X: float32(x), Y: float32(y)}, 100, rl.DarkGray, false, true, ML_MED, *rock)
+					g.ObjectManager.CreateNewObject(ROCK, rl.Vector2{X: float32(x), Y: float32(y)}, 60, rl.DarkGray, false, true, ML_MED, *rock)
 				}
 			}
 

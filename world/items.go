@@ -22,21 +22,22 @@ const (
 )
 
 type Item struct {
-	Id        ItemId
-	Name      string
-	MaxStack  int
-	Type      ItemType
-	MineLevel MineLevel
+	Id         ItemId
+	Name       string
+	MaxStack   int
+	Type       ItemType
+	MineLevel  MineLevel
+	MineDamage int
 }
 
 var itemMap map[string]*Item = make(map[string]*Item, 0)
 
 func InitItemMap() {
-	itemMap["rock"] = &Item{Id: I_ROCK, Name: "Rock", Type: ITEM, MaxStack: 100, MineLevel: ML_LOW}
-	itemMap["coal"] = &Item{Id: I_COAL, Name: "Coal", Type: ITEM, MaxStack: 100, MineLevel: ML_LOW}
-	itemMap["seeds"] = &Item{Id: I_SEEDS, Name: "Seeds", Type: ITEM, MaxStack: 50, MineLevel: ML_LOW}
-	itemMap["torch"] = &Item{Id: I_TORCH, Name: "Torch", Type: ITEM, MaxStack: 50, MineLevel: ML_LOW}
-	itemMap["pickaxe"] = &Item{Id: I_PICKAXE, Name: "Pickaxe", Type: WEAPON, MaxStack: 1, MineLevel: ML_MED}
+	itemMap["rock"] = &Item{Id: I_ROCK, Name: "Rock", Type: ITEM, MaxStack: 100, MineLevel: ML_LOW, MineDamage: 1}
+	itemMap["coal"] = &Item{Id: I_COAL, Name: "Coal", Type: ITEM, MaxStack: 100, MineLevel: ML_LOW, MineDamage: 1}
+	itemMap["seeds"] = &Item{Id: I_SEEDS, Name: "Seeds", Type: ITEM, MaxStack: 50, MineLevel: ML_LOW, MineDamage: 1}
+	itemMap["torch"] = &Item{Id: I_TORCH, Name: "Torch", Type: ITEM, MaxStack: 50, MineLevel: ML_LOW, MineDamage: 1}
+	itemMap["pickaxe"] = &Item{Id: I_PICKAXE, Name: "Pickaxe", Type: WEAPON, MaxStack: 1, MineLevel: ML_MED, MineDamage: 10}
 }
 
 func GetItemByName(name string) (*Item, error) {
