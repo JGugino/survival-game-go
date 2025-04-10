@@ -1,9 +1,8 @@
-package utils
+package world
 
 import (
 	"fmt"
 
-	"github.com/JGugino/survival-game-go/objects"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -24,11 +23,12 @@ type WorldGenerator struct {
 	WorldNoiseImage rl.Image
 	WorldGrid       [64][64]int
 	SpawnPoint      rl.Vector2
-	ObjectManager   objects.Objects
+	ObjectManager   Objects
 }
 
 func (g *WorldGenerator) InitWorldGrid() {
-	g.ObjectManager.InitObjectGrid()
+	g.ObjectManager.InitObjectGrid(g.MapWidth, g.MapHeight, g.CellSize)
+
 	for y := range g.MapHeight {
 		for x := range g.MapWidth {
 			pixelColor := rl.GetImageColor(g.WorldNoiseImage, int32(x), int32(y))
@@ -36,8 +36,14 @@ func (g *WorldGenerator) InitWorldGrid() {
 
 			if tileType == STONE {
 				test := rl.GetRandomValue(0, 6)
-				if test >= 5 {
-					g.ObjectManager.CreateNewObject(objects.ROCK, rl.Vector2{X: float32(x), Y: float32(y)}, 100, rl.DarkGray, false, true, objects.ML_MED, 1)
+				if test > 5 {
+					rock, err := GetItemByName("rock")
+
+					if err != nil {
+						return
+					}
+
+					g.ObjectManager.CreateNewObject(ROCK, rl.Vector2{X: float32(x), Y: float32(y)}, 100, rl.DarkGray, false, true, ML_MED, *rock)
 				}
 			}
 

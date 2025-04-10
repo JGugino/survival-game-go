@@ -1,13 +1,17 @@
 package handlers
 
 import (
+	"fmt"
+	"math"
+
 	"github.com/JGugino/survival-game-go/entities"
 	"github.com/JGugino/survival-game-go/utils"
+	"github.com/JGugino/survival-game-go/world"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 type Game struct {
-	Generator       *utils.WorldGenerator
+	Generator       *world.WorldGenerator
 	Camera          *rl.Camera2D
 	CurrentPlayer   *entities.Player
 	PlayerInventory *Inventory
@@ -15,6 +19,8 @@ type Game struct {
 }
 
 func (g *Game) Init() {
+	world.InitItemMap()
+
 	g.Generator.GenerateNewWorldNoiseImage(int(rl.GetRandomValue(0, 20)), int(rl.GetRandomValue(0, 20)), 2)
 	g.Generator.InitWorldGrid()
 	g.Generator.SelectValidSpawnPoint()
@@ -25,6 +31,9 @@ func (g *Game) Init() {
 
 	//Moves the player to the world's spawn point
 	g.CurrentPlayer.MoveToWorldPosition(g.Generator.SpawnPoint)
+
+	g.PlayerInventory.AddItemToHotbar(0, world.I_PICKAXE)
+	g.PlayerInventory.DrawHotbarToConsole()
 }
 
 func (g *Game) HandleInput() {
@@ -33,12 +42,26 @@ func (g *Game) HandleInput() {
 	g.DebugPanel.HandleInput()
 
 	if rl.IsMouseButtonPressed(rl.MouseButtonLeft) {
-		// worldPos := rl.GetScreenToWorldRay(rl.Vector2{X: float32(rl.GetMouseX()), Y: float32(rl.GetMouseY())}, (*g.Camera))
+		worldPos := rl.GetScreenToWorld2D(rl.Vector2{X: float32(math.Round(float64(rl.GetMouseX()))), Y: float32(float64(rl.GetMouseY()))}, (*g.Camera))
 
-		// id, obj := g.Generator.ObjectManager.GetObjectAtWorldPosition(worldPos.Position)
+		_, obj, err := g.Generator.ObjectManager.GetObjectAtWorldPosition(worldPos)
 
-		// fmt.Println(id)
-		// fmt.Println(obj)
+		if err != nil {
+			return
+		}
+
+		activeHotbarSlotItem, err := world.GetItemByItemId(g.PlayerInventory.Hotbar[g.PlayerInventory.SelectedHotbarSlot])
+
+		if err != nil {
+			return
+		}
+
+		if obj.Mineable {
+			if activeHotbarSlotItem.MineLevel >= obj.Level {
+				fmt.Printf("Can mine %s\n", obj.DroppedItem.Name)
+			}
+		}
+
 	}
 }
 

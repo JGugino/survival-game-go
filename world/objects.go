@@ -1,28 +1,26 @@
-package objects
+package world
 
 import (
+	"errors"
 	"fmt"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
-)
-
-type ObjectId int
-
-const (
-	EMPTY ObjectId = 0
-	ROCK  ObjectId = 1
-	TREE  ObjectId = 2
+	"github.com/google/uuid"
 )
 
 type Objects struct {
-	Objs       map[string]Object
+	Objs       map[uuid.UUID]Object
 	Width      int
 	Height     int
 	CellSize   int
 	ObjectGrid [64][64]int
 }
 
-func (o *Objects) InitObjectGrid() {
+func (o *Objects) InitObjectGrid(mapWidth int, mapHeight int, cellSize int) {
+	o.Width = mapWidth
+	o.Height = mapHeight
+	o.CellSize = cellSize
+
 	for y := range o.Height {
 		for x := range o.Width {
 			o.ObjectGrid[x][y] = int(EMPTY)
@@ -30,9 +28,9 @@ func (o *Objects) InitObjectGrid() {
 	}
 }
 
-func (o *Objects) CreateNewObject(object ObjectId, position rl.Vector2, health int, color rl.Color, movable bool, mineable bool, mineLevel MineLevel, droppedItem int) string {
+func (o *Objects) CreateNewObject(object ObjectId, position rl.Vector2, health int, color rl.Color, movable bool, mineable bool, mineLevel MineLevel, droppedItem Item) uuid.UUID {
 
-	objId := string(rl.GetRandomValue(0, 2147483647))
+	objId := uuid.New()
 
 	obj := Object{
 		Id:          objId,
@@ -53,30 +51,25 @@ func (o *Objects) CreateNewObject(object ObjectId, position rl.Vector2, health i
 	return objId
 }
 
-func (o *Objects) RemoveObject(objId string) {
+func (o *Objects) RemoveObject(objId uuid.UUID) {
 	obj := o.Objs[objId]
 	o.ObjectGrid[int(obj.Position.X)][int(obj.Position.Y)] = 0
 	delete(o.Objs, objId)
 }
 
-func (o *Objects) GetObjectAtWorldPosition(position rl.Vector2) (string, Object) {
+func (o *Objects) GetObjectAtWorldPosition(position rl.Vector2) (uuid.UUID, *Object, error) {
+	//Clicked position on the object grid
 	gridX := int(position.X) / o.CellSize
 	gridY := int(position.Y) / o.CellSize
 
+	//Goes through all of the objects to
 	for _, x := range o.Objs {
-		fmt.Println("---Object Start---")
-		fmt.Println(x.Position.X)
-		fmt.Println(x.Position.Y)
-		fmt.Println(gridX)
-		fmt.Println(gridY)
-		fmt.Println("---Object End---")
 		if int(x.Position.X) == gridX && int(x.Position.Y) == gridY {
-
-			return x.Id, x
+			return x.Id, &x, nil
 		}
 	}
 
-	return "", Object{}
+	return uuid.UUID{}, &Object{}, errors.New("no-object")
 }
 
 func (o *Objects) DrawObjects() {

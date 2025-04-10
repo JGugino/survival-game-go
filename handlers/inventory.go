@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/JGugino/survival-game-go/utils"
+	"github.com/JGugino/survival-game-go/world"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -24,7 +25,7 @@ type InventoryPosition struct {
 type Inventory struct {
 	HotbarSize         int
 	MainInventory      utils.Container
-	Hotbar             [9]utils.ItemId
+	Hotbar             [9]world.ItemId
 	CellSize           int
 	SelectedHotbarSlot int
 	Visible            bool
@@ -68,6 +69,10 @@ func (i *Inventory) DrawHotbar() {
 			rl.DrawRectangleLinesEx(rl.Rectangle{X: float32(x*i.CellSize + i.Positioning.HotbarXOffset + i.Positioning.HotbarCellXOffset), Y: float32(i.Positioning.HotbarYOffset) + float32(i.Positioning.HotbarCellYOffset), Width: float32(i.CellSize), Height: float32(i.CellSize)}, 3, rl.Black)
 		}
 	}
+}
+
+func (i *Inventory) AddItemToHotbar(slot int, itemId world.ItemId) {
+	i.Hotbar[slot] = itemId
 }
 
 func (i *Inventory) InputHandler() {
@@ -169,12 +174,12 @@ func (i *Inventory) DrawHotbarToConsole() {
 func (i *Inventory) ClearInventory() {
 	for y := range i.MainInventory.Height {
 		for x := range i.MainInventory.Width {
-			i.MainInventory.ItemGrid[x][y] = utils.EMPTY
+			i.MainInventory.ItemGrid[x][y] = 0
 		}
 	}
 }
 func (i *Inventory) ClearHotbar() {
 	for x := range i.HotbarSize {
-		i.Hotbar[x] = utils.EMPTY
+		i.Hotbar[x] = 0
 	}
 }

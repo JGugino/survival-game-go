@@ -3,9 +3,10 @@ package main
 import (
 	"github.com/JGugino/survival-game-go/entities"
 	"github.com/JGugino/survival-game-go/handlers"
-	"github.com/JGugino/survival-game-go/objects"
 	"github.com/JGugino/survival-game-go/utils"
+	"github.com/JGugino/survival-game-go/world"
 	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/google/uuid"
 )
 
 const (
@@ -21,15 +22,12 @@ func main() {
 
 	rl.SetTargetFPS(TARGET_FPS)
 
-	worldGenerator := utils.WorldGenerator{
+	worldGenerator := world.WorldGenerator{
 		CellSize:  40,
 		MapWidth:  64,
 		MapHeight: 64,
-		ObjectManager: objects.Objects{
-			Objs:     make(map[string]objects.Object, 0),
-			Width:    64,
-			Height:   64,
-			CellSize: 40,
+		ObjectManager: world.Objects{
+			Objs: make(map[uuid.UUID]world.Object, 0),
 		},
 	}
 

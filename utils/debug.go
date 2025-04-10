@@ -4,11 +4,12 @@ import (
 	"fmt"
 
 	"github.com/JGugino/survival-game-go/entities"
+	"github.com/JGugino/survival-game-go/world"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 type Debug struct {
-	Generator        *WorldGenerator
+	Generator        *world.WorldGenerator
 	CurrentPlayer    *entities.Player
 	DebugOpen        bool
 	DebugFontSize    float32
@@ -49,16 +50,19 @@ func (d *Debug) Draw() {
 	rl.DrawFPS(int32(d.ContentOffsetX), int32(d.ContentOffsetY))
 
 	// World Spawn
-	rl.DrawText(fmt.Sprintf("Spawn - X: %.0f / Y: %.0f", d.Generator.SpawnPoint.X, d.Generator.SpawnPoint.Y), int32(d.ContentOffsetX), int32(d.ContentOffsetY+d.DebugTextSpacing), int32(d.DebugFontSize), rl.Black)
+	rl.DrawText(fmt.Sprintf("Spawn: - X: %.0f / Y: %.0f", d.Generator.SpawnPoint.X, d.Generator.SpawnPoint.Y), int32(d.ContentOffsetX), int32(d.ContentOffsetY+d.DebugTextSpacing), int32(d.DebugFontSize), rl.Black)
 
 	// Player Position
-	rl.DrawText(fmt.Sprintf("Player - X: %.0f / Y: %.0f", d.CurrentPlayer.Position.X, d.CurrentPlayer.Position.Y), int32(d.ContentOffsetX), int32(d.ContentOffsetY)+int32(d.DebugTextSpacing)*2, int32(d.DebugFontSize), rl.Black)
+	rl.DrawText(fmt.Sprintf("Player: - X: %.0f / Y: %.0f", d.CurrentPlayer.Position.X, d.CurrentPlayer.Position.Y), int32(d.ContentOffsetX), int32(d.ContentOffsetY)+int32(d.DebugTextSpacing)*2, int32(d.DebugFontSize), rl.Black)
 
 	// Mouse Position
-	rl.DrawText(fmt.Sprintf("Mouse - X: %d / Y: %d", rl.GetMouseX(), rl.GetMouseY()), int32(d.ContentOffsetX), int32(d.ContentOffsetY)+int32(d.DebugTextSpacing)*3, int32(d.DebugFontSize), rl.Black)
+	rl.DrawText(fmt.Sprintf("Mouse: - X: %d / Y: %d", rl.GetMouseX(), rl.GetMouseY()), int32(d.ContentOffsetX), int32(d.ContentOffsetY)+int32(d.DebugTextSpacing)*3, int32(d.DebugFontSize), rl.Black)
 
 	//Standing Tile
-	rl.DrawText(fmt.Sprintf("Tile - %s", d.StandingTile), int32(d.ContentOffsetX), int32(d.ContentOffsetY)+int32(d.DebugTextSpacing)*4, int32(d.DebugFontSize), rl.Black)
+	rl.DrawText(fmt.Sprintf("Tile: - %s", d.StandingTile), int32(d.ContentOffsetX), int32(d.ContentOffsetY)+int32(d.DebugTextSpacing)*4, int32(d.DebugFontSize), rl.Black)
+
+	//Total Objects
+	rl.DrawText(fmt.Sprintf("Total Objs: - %d", len(d.Generator.ObjectManager.Objs)), int32(d.ContentOffsetX), int32(d.ContentOffsetY)+int32(d.DebugTextSpacing)*5, int32(d.DebugFontSize), rl.Black)
 }
 
 func (d *Debug) HandleInput() {
