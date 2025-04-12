@@ -44,8 +44,18 @@ func main() {
 		CellSize:           DEFAULT_CELL_SIZE,
 		Visible:            false,
 		SelectedHotbarSlot: 0,
-		Hovering:           false,
-		MainInventory:      utils.Container{Width: 9, Height: 4, ScreenWidth: 9 * DEFAULT_CELL_SIZE, ScreenHeight: 4 * DEFAULT_CELL_SIZE},
+		Hover: struct {
+			InventoryHovering  bool
+			InventoryHoverSlot rl.Vector2
+			HotbarHovering     bool
+			HotbarHoverSlot    rl.Vector2
+		}{
+			InventoryHovering:  false,
+			InventoryHoverSlot: rl.Vector2Zero(),
+			HotbarHovering:     false,
+			HotbarHoverSlot:    rl.Vector2Zero(),
+		},
+		MainInventory: utils.Container{Width: 9, Height: 4, ScreenWidth: 9 * DEFAULT_CELL_SIZE, ScreenHeight: 4 * DEFAULT_CELL_SIZE},
 		Positioning: handlers.InventoryPosition{
 			InventoryYOffset:     40,
 			InventoryXPadding:    10,

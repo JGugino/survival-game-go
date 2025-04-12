@@ -56,15 +56,20 @@ func (g *WorldGenerator) InitWorldGrid() {
 func (g *WorldGenerator) DrawWorld() {
 	for y := range g.MapHeight {
 		for x := range g.MapWidth {
-			pixelColor := rl.GetImageColor(g.WorldNoiseImage, int32(x), int32(y))
-			rl.DrawRectangle(int32(x*g.CellSize), int32(y*g.CellSize), int32(g.CellSize), int32(g.CellSize), g.GetColorForTileType(g.GetPixelType(pixelColor)))
+			//Draw world tiles
+			if g.ObjectManager.ObjectGrid[x][y] == 0 {
+				pixelColor := rl.GetImageColor(g.WorldNoiseImage, int32(x), int32(y))
+				rl.DrawRectangle(int32(x*g.CellSize), int32(y*g.CellSize), int32(g.CellSize), int32(g.CellSize), g.GetColorForTileType(g.GetPixelType(pixelColor)))
+			}
+
+			//Draw object tiles
+			g.ObjectManager.DrawObjects(x, y)
 		}
 	}
-
-	g.ObjectManager.DrawObjects()
 }
 
 func (g *WorldGenerator) DrawWorldToConsole() {
+	fmt.Println("###WORLD###")
 	for y := range g.MapHeight {
 		for x := range g.MapWidth {
 			tile := g.WorldGrid[x][y]

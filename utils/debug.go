@@ -19,6 +19,7 @@ type Debug struct {
 	ContentOffsetX   float32
 	ContentOffsetY   float32
 	StandingTile     string
+	WireMode         bool
 }
 
 func (d *Debug) Update() {
@@ -69,5 +70,10 @@ func (d *Debug) HandleInput() {
 	//Toggle debug window
 	if rl.IsKeyPressed(rl.KeyF3) {
 		d.DebugOpen = !d.DebugOpen
+	}
+
+	//Toggle wiremode
+	if rl.IsKeyPressed(rl.KeyF8) {
+		d.WireMode = !d.WireMode
 	}
 }

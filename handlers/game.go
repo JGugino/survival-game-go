@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"math"
 
 	"github.com/JGugino/survival-game-go/entities"
@@ -32,7 +33,7 @@ func (g *Game) Init() {
 	g.CurrentPlayer.MoveToWorldPosition(g.Generator.SpawnPoint)
 
 	g.PlayerInventory.AddItemToHotbar(0, world.I_PICKAXE)
-	g.PlayerInventory.DrawHotbarToConsole()
+	g.PlayerInventory.AddItemToInventory(world.I_SEEDS)
 }
 
 func (g *Game) HandleInput() {
@@ -57,7 +58,12 @@ func (g *Game) HandleInput() {
 
 		if obj.Mineable {
 			if activeHotbarSlotItem.MineLevel >= obj.Level {
-				g.Generator.ObjectManager.DamageObject(obj.Id, activeHotbarSlotItem.MineDamage)
+				err = g.Generator.ObjectManager.DamageObject(obj.Id, activeHotbarSlotItem.MineDamage)
+
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
 			}
 		}
 
@@ -71,7 +77,33 @@ func (g *Game) Update() {
 
 	g.Camera.Target = g.CurrentPlayer.Position
 
+	for _, i := range world.WorldItems {
+
+		colliding, _ := i.HandleItemCollision(rl.Rectangle{X: g.CurrentPlayer.Position.X, Y: g.CurrentPlayer.Position.Y, Width: float32(g.CurrentPlayer.Width), Height: float32(g.CurrentPlayer.Height)})
+
+		if colliding {
+			err := g.PlayerInventory.AddItemToInventory(i.Item.Id)
+
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+
+			err = world.RemoveWorldItem(i.Id)
+
+			if err != nil {
+				return
+			}
+		}
+	}
+
 	g.limitCamera()
+
+	if g.DebugPanel.WireMode {
+		rl.EnableWireMode()
+	} else if !g.DebugPanel.WireMode {
+		rl.DisableWireMode()
+	}
 }
 
 func (g *Game) Draw() {
@@ -80,6 +112,7 @@ func (g *Game) Draw() {
 
 	g.Generator.DrawWorld()
 	g.CurrentPlayer.Draw()
+	world.DrawWorldItems()
 
 	rl.EndMode2D()
 
@@ -88,6 +121,8 @@ func (g *Game) Draw() {
 	if g.PlayerInventory.Visible {
 		g.PlayerInventory.DrawInventory()
 	}
+
+	g.PlayerInventory.DrawHoldingItem()
 
 	if g.DebugPanel.DebugOpen {
 		g.DebugPanel.Draw()

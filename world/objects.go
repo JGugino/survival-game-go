@@ -66,6 +66,13 @@ func (o *Objects) DamageObject(objId uuid.UUID, damage int) error {
 	obj.Health -= damage
 
 	if obj.Health <= 0 {
+		_, _, err := NewWorldItem(obj.DroppedItem.Id, rl.Vector2{X: (obj.Position.X * float32(o.CellSize)) + float32(o.CellSize)/2, Y: (obj.Position.Y*float32(o.CellSize) + float32(o.CellSize)/2)})
+
+		if err != nil {
+
+			return err
+		}
+
 		o.RemoveObject(objId)
 		return nil
 	}
@@ -88,20 +95,16 @@ func (o *Objects) GetObjectAtWorldPosition(position rl.Vector2) (uuid.UUID, *Obj
 	return uuid.UUID{}, &Object{}, errors.New("no-object")
 }
 
-func (o *Objects) DrawObjects() {
-	for y := range o.Height {
-		for x := range o.Width {
-			tile := o.ObjectGrid[x][y]
+func (o *Objects) DrawObjects(x int, y int) {
+	tile := o.ObjectGrid[x][y]
 
-			if tile == 1 { //Rock
-				rl.DrawRectangle(int32(x*o.CellSize), int32(y*o.CellSize), int32(o.CellSize), int32(o.CellSize), rl.DarkGray)
-			}
-
-		}
+	if tile == 1 { //Rock
+		rl.DrawRectangle(int32(x*o.CellSize), int32(y*o.CellSize), int32(o.CellSize), int32(o.CellSize), rl.DarkGray)
 	}
 }
 
 func (o *Objects) DrawObjectGridToConsole() {
+	fmt.Println("###OBJECTS###")
 	for y := range o.Height {
 		for x := range o.Width {
 			fmt.Print(o.ObjectGrid[x][y])
