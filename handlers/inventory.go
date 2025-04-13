@@ -56,6 +56,12 @@ func (i *Inventory) DrawInventory() {
 	// Inventory background
 	rl.DrawRectangleRounded(rl.Rectangle{X: float32(offsetX), Y: float32(offsetY - i.Positioning.InventoryYOffset), Width: float32(i.MainInventory.ScreenWidth + i.Positioning.InventoryXPadding), Height: float32(i.MainInventory.ScreenHeight + i.Positioning.InventoryYPadding)}, 0.1, 1, transparentWhite)
 
+	tMap, err := world.GetTextureMap("items")
+
+	if err != nil {
+		return
+	}
+
 	for y := range i.MainInventory.Height {
 		for x := range i.MainInventory.Width {
 			slotXOffset := int32(x*i.CellSize + offsetX + i.Positioning.InventoryCellXOffset)
@@ -82,7 +88,9 @@ func (i *Inventory) DrawInventory() {
 					return
 				}
 
-				rl.DrawCircle(slotXOffset+int32(i.CellSize)/2, slotYOffset+int32(i.CellSize)/2, 12, slotItem.Color)
+				itemPosition := rl.Vector2{X: float32(slotXOffset + int32(i.CellSize)/2), Y: float32(slotYOffset + int32(i.CellSize)/2)}
+
+				tMap.DrawTextureAtPositionWithScaling(slotItem.Texture.TexturePosition, itemPosition, slotItem.Texture.ContainerDrawSize)
 				//Item stack quantity text
 				if stack.StackSize > 1 {
 					rl.DrawText(fmt.Sprintf("%d", stack.StackSize), slotXOffset+int32(i.CellSize)-10, slotYOffset+int32(i.CellSize)-10, 16, rl.Black)
@@ -95,6 +103,12 @@ func (i *Inventory) DrawInventory() {
 func (i *Inventory) DrawHotbar() {
 	// Hotbar background
 	rl.DrawRectangleRounded(rl.Rectangle{X: float32(i.Positioning.HotbarXOffset), Y: float32(i.Positioning.HotbarYOffset), Width: float32(i.HotbarSize)*float32(i.CellSize) + float32(i.Positioning.HotbarXPadding), Height: float32(i.CellSize) + float32(i.Positioning.HotbarYPadding)}, 0.1, 1, transparentWhite)
+
+	tMap, err := world.GetTextureMap("items")
+
+	if err != nil {
+		return
+	}
 
 	for x := range i.HotbarSize {
 		slotXOffset := int32(x*i.CellSize + i.Positioning.HotbarXOffset + i.Positioning.HotbarCellXOffset)
@@ -113,20 +127,37 @@ func (i *Inventory) DrawHotbar() {
 				return
 			}
 
-			rl.DrawCircle(slotXOffset+int32(i.CellSize)/2, slotYOffset+int32(i.CellSize)/2, 12, slotItem.Color)
+			_, stack, err := world.GetItemStackAtInventorySlot(rl.Vector2{X: float32(x), Y: float32(0)}, world.SL_HOTBAR)
+
+			itemPosition := rl.Vector2{X: float32(slotXOffset + int32(i.CellSize)/2), Y: float32(slotYOffset + int32(i.CellSize)/2)}
+
+			tMap.DrawTextureAtPositionWithScaling(slotItem.Texture.TexturePosition, itemPosition, slotItem.Texture.ContainerDrawSize)
+
+			//Item stack quantity text
+			if stack.StackSize > 1 {
+				rl.DrawText(fmt.Sprintf("%d", stack.StackSize), slotXOffset+int32(i.CellSize)-10, slotYOffset+int32(i.CellSize)-10, 16, rl.Black)
+			}
 		}
 	}
 }
 
 func (i *Inventory) DrawHoldingItem() {
 	if i.HoldingItem {
+		tMap, err := world.GetTextureMap("items")
+
+		if err != nil {
+			return
+		}
+
 		item, err := world.GetItemByItemId(i.SelectedInventoryItem.itemId)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
 
-		rl.DrawCircle(rl.GetMouseX(), rl.GetMouseY(), 12, item.Color)
+		itemPosition := rl.Vector2{X: float32(rl.GetMouseX()), Y: float32(rl.GetMouseY())}
+
+		tMap.DrawTextureAtPositionWithScaling(item.Texture.TexturePosition, itemPosition, item.Texture.ContainerDrawSize)
 	}
 }
 
@@ -254,7 +285,6 @@ func (i *Inventory) MoveItemToInventoryGridPosition(gridPos rl.Vector2, itemId w
 }
 
 func (i *Inventory) InventoryInputHandler() {
-
 	if !i.Hover.InventoryHovering {
 		if rl.IsMouseButtonPressed(rl.MouseButtonLeft) && i.HoldingItem {
 			i.MainInventory.ItemGrid[int(i.SelectedInventoryItem.startPos.X)][int(i.SelectedInventoryItem.startPos.Y)] = i.SelectedInventoryItem.itemId
@@ -272,6 +302,7 @@ func (i *Inventory) InventoryInputHandler() {
 			slotX := x*i.CellSize + offsetX + i.Positioning.InventoryCellXOffset
 			slotY := y*i.CellSize + offsetY + i.Positioning.InventoryCellYOffset
 
+			//Check if the mouse position is inside the inventory slot
 			if rl.GetMouseX() >= int32(slotX) && rl.GetMouseX() <= int32(slotX)+int32(i.CellSize) {
 				if rl.GetMouseY() >= int32(slotY) && rl.GetMouseY() <= int32(slotY)+int32(i.CellSize) {
 					i.Hover.InventoryHovering = true
@@ -334,7 +365,6 @@ func (i *Inventory) InventoryInputHandler() {
 			}
 		}
 	}
-
 }
 
 func (i *Inventory) HotbarInputHandler() {
@@ -442,7 +472,6 @@ func (i *Inventory) HotbarInputHandler() {
 			}
 		}
 	}
-
 }
 
 func (i *Inventory) PickupItemFromInventory(position rl.Vector2, section world.StackLocation) {

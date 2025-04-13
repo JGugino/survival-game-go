@@ -20,6 +20,10 @@ const (
 	DEFAULT_MAP_HEIGHT = 64
 )
 
+//TODO: Add window close requesting and saving of data on close
+// var windowCloseRequested bool = false
+// var windowClose bool = false
+
 func main() {
 	rl.InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE)
 	defer rl.CloseWindow()
@@ -35,9 +39,21 @@ func main() {
 		},
 	}
 
-	player := entities.Player{Position: rl.Vector2{X: worldGenerator.SpawnPoint.X, Y: worldGenerator.SpawnPoint.Y}, Health: 100, Speed: 2, Width: DEFAULT_CELL_SIZE, Height: DEFAULT_CELL_SIZE, Direction: entities.UP, Moving: false}
+	player := entities.Player{
+		Position:  rl.Vector2{X: worldGenerator.SpawnPoint.X, Y: worldGenerator.SpawnPoint.Y},
+		Health:    100,
+		Speed:     2,
+		Width:     DEFAULT_CELL_SIZE,
+		Height:    DEFAULT_CELL_SIZE,
+		Direction: entities.UP,
+		Moving:    false}
 
-	mainCamera := rl.Camera2D{Offset: rl.Vector2{X: WINDOW_WIDTH / 2, Y: WINDOW_HEIGHT / 2}, Target: player.Position, Rotation: 0, Zoom: 1.2}
+	mainCamera := rl.Camera2D{
+		Offset:   rl.Vector2{X: WINDOW_WIDTH / 2, Y: WINDOW_HEIGHT / 2},
+		Target:   player.Position,
+		Rotation: 0,
+		Zoom:     1.2,
+	}
 
 	inv := handlers.Inventory{
 		HotbarSize:         9,
@@ -106,4 +122,5 @@ func main() {
 
 		rl.EndDrawing()
 	}
+	game.CleanUp()
 }

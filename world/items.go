@@ -39,7 +39,7 @@ type Item struct {
 	Type       ItemType
 	MineLevel  MineLevel
 	MineDamage int
-	Color      rl.Color
+	Texture    TextureIdentifier
 }
 
 type WorldItem struct {
@@ -61,11 +61,10 @@ var itemStacks map[uuid.UUID]*ItemStack = make(map[uuid.UUID]*ItemStack, 0)
 var itemMap map[string]*Item = make(map[string]*Item, 0)
 
 func InitItemMap() {
-	itemMap["rock"] = &Item{Id: I_ROCK, Name: "Rock", Type: ITEM, MaxStack: 10, MineLevel: ML_LOW, MineDamage: 1, Color: rl.DarkGray}
-	itemMap["coal"] = &Item{Id: I_COAL, Name: "Coal", Type: ITEM, MaxStack: 100, MineLevel: ML_LOW, MineDamage: 1, Color: rl.Black}
-	itemMap["seeds"] = &Item{Id: I_SEEDS, Name: "Seeds", Type: ITEM, MaxStack: 50, MineLevel: ML_LOW, MineDamage: 1, Color: rl.Green}
-	itemMap["torch"] = &Item{Id: I_TORCH, Name: "Torch", Type: ITEM, MaxStack: 50, MineLevel: ML_LOW, MineDamage: 1, Color: rl.Orange}
-	itemMap["pickaxe"] = &Item{Id: I_PICKAXE, Name: "Pickaxe", Type: WEAPON, MaxStack: 1, MineLevel: ML_MED, MineDamage: 10, Color: rl.Brown}
+	itemMap["rock"] = &Item{Id: I_ROCK, Name: "Rock", Type: ITEM, MaxStack: 10, MineLevel: ML_LOW, MineDamage: 1, Texture: TextureIdentifier{TextureMapId: "items", TexturePosition: rl.Vector2{X: 0, Y: 0}, ContainerDrawSize: 40, WorldDrawSize: 36}}
+	itemMap["pickaxe"] = &Item{Id: I_PICKAXE, Name: "Pickaxe", Type: WEAPON, MaxStack: 1, MineLevel: ML_MED, MineDamage: 10, Texture: TextureIdentifier{TextureMapId: "items", TexturePosition: rl.Vector2{X: 1, Y: 0}, ContainerDrawSize: 40, WorldDrawSize: 36}}
+	itemMap["torch"] = &Item{Id: I_TORCH, Name: "Torch", Type: ITEM, MaxStack: 50, MineLevel: ML_LOW, MineDamage: 1, Texture: TextureIdentifier{TextureMapId: "items", TexturePosition: rl.Vector2{X: 2, Y: 0}, ContainerDrawSize: 40, WorldDrawSize: 36}}
+	itemMap["seeds"] = &Item{Id: I_SEEDS, Name: "Seeds", Type: ITEM, MaxStack: 50, MineLevel: ML_LOW, MineDamage: 1, Texture: TextureIdentifier{TextureMapId: "items", TexturePosition: rl.Vector2{X: 3, Y: 0}, ContainerDrawSize: 40, WorldDrawSize: 36}}
 }
 
 func GetItemByName(name string) (*Item, error) {
@@ -133,8 +132,15 @@ func RemoveWorldItem(id uuid.UUID) error {
 }
 
 func DrawWorldItems() {
+	tMap, err := GetTextureMap("items")
+
+	if err != nil {
+		return
+	}
+
 	for _, i := range WorldItems {
-		rl.DrawCircle(int32(i.Position.X), int32(i.Position.Y), 12, i.Item.Color)
+		itemPos := rl.Vector2{X: float32(i.Position.X), Y: float32(i.Position.Y)}
+		tMap.DrawTextureAtPositionWithScaling(i.Item.Texture.TexturePosition, itemPos, i.Item.Texture.WorldDrawSize)
 	}
 }
 

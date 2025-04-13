@@ -19,8 +19,15 @@ type Game struct {
 }
 
 func (g *Game) Init() {
+	//Load Textures
+	world.LoadNewTextureMap("world-tiles", "assets/world_tiles.png", 16)
+	world.LoadNewTextureMap("world-objects", "assets/world_objects.png", 16)
+	world.LoadNewTextureMap("items", "assets/items.png", 16)
+
+	//Initialize all game items
 	world.InitItemMap()
 
+	//Generate a new world and spawn point
 	g.Generator.GenerateNewWorldNoiseImage(int(rl.GetRandomValue(0, 20)), int(rl.GetRandomValue(0, 20)), 2)
 	g.Generator.InitWorldGrid()
 	g.Generator.SelectValidSpawnPoint()
@@ -32,8 +39,13 @@ func (g *Game) Init() {
 	//Moves the player to the world's spawn point
 	g.CurrentPlayer.MoveToWorldPosition(g.Generator.SpawnPoint)
 
+	//TEST - Give the player a pickaxe in the hotbar and seed in the inventory
 	g.PlayerInventory.AddItemToHotbar(0, world.I_PICKAXE)
 	g.PlayerInventory.AddItemToInventory(world.I_SEEDS)
+}
+
+func (g *Game) CleanUp() {
+	world.UnloadTextureMaps()
 }
 
 func (g *Game) HandleInput() {

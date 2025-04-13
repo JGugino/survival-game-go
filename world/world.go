@@ -54,12 +54,36 @@ func (g *WorldGenerator) InitWorldGrid() {
 }
 
 func (g *WorldGenerator) DrawWorld() {
+	tMap, err := GetTextureMap("world-tiles")
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
 	for y := range g.MapHeight {
 		for x := range g.MapWidth {
 			//Draw world tiles
-			if g.ObjectManager.ObjectGrid[x][y] == 0 {
-				pixelColor := rl.GetImageColor(g.WorldNoiseImage, int32(x), int32(y))
-				rl.DrawRectangle(int32(x*g.CellSize), int32(y*g.CellSize), int32(g.CellSize), int32(g.CellSize), g.GetColorForTileType(g.GetPixelType(pixelColor)))
+			pixelType := g.GetPixelType(rl.GetImageColor(g.WorldNoiseImage, int32(x), int32(y)))
+
+			cellPosition := rl.Vector2{X: float32(x * g.CellSize), Y: float32(y * g.CellSize)}
+
+			switch pixelType {
+			case WATER:
+				tMap.DrawTextureAtPositionWithScaling(rl.Vector2{X: 0, Y: 0}, cellPosition, g.CellSize)
+				break
+			case GRASS:
+				tMap.DrawTextureAtPositionWithScaling(rl.Vector2{X: 1, Y: 0}, cellPosition, g.CellSize)
+				break
+			case SAND:
+				tMap.DrawTextureAtPositionWithScaling(rl.Vector2{X: 2, Y: 0}, cellPosition, g.CellSize)
+				break
+			case STONE:
+				tMap.DrawTextureAtPositionWithScaling(rl.Vector2{X: 3, Y: 0}, cellPosition, g.CellSize)
+				break
+			case SNOW:
+				tMap.DrawTextureAtPositionWithScaling(rl.Vector2{X: 4, Y: 0}, cellPosition, g.CellSize)
+				break
 			}
 
 			//Draw object tiles
