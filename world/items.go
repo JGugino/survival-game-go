@@ -2,6 +2,7 @@ package world
 
 import (
 	"errors"
+	"fmt"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/google/uuid"
@@ -10,7 +11,14 @@ import (
 type ItemId int32
 type ItemType int32
 
+type StackLocation int8
+
 const (
+	//Stack Locations
+	SL_HOTBAR    StackLocation = 0
+	SL_INVENTORY StackLocation = 1
+	SL_WORLD     StackLocation = 2
+
 	//Item Ids
 	I_ROCK    ItemId = 1
 	I_COAL    ItemId = 2
@@ -39,6 +47,16 @@ type WorldItem struct {
 	Item     Item
 	Position rl.Vector2
 }
+
+type ItemStack struct {
+	Id            uuid.UUID
+	ItemId        ItemId
+	StackSize     int
+	InventorySlot rl.Vector2
+	Section       StackLocation
+}
+
+var itemStacks map[uuid.UUID]*ItemStack = make(map[uuid.UUID]*ItemStack, 0)
 
 var itemMap map[string]*Item = make(map[string]*Item, 0)
 
@@ -118,4 +136,59 @@ func DrawWorldItems() {
 	for _, i := range WorldItems {
 		rl.DrawCircle(int32(i.Position.X), int32(i.Position.Y), 12, i.Item.Color)
 	}
+}
+
+// Item stacks
+func CreateNewItemStack(inventorySlot rl.Vector2, itemId ItemId, section StackLocation) (uuid.UUID, *ItemStack) {
+	stackId := uuid.New()
+	newStack := &ItemStack{
+		Id:            stackId,
+		InventorySlot: inventorySlot,
+		ItemId:        itemId,
+		StackSize:     1,
+		Section:       section,
+	}
+
+	itemStacks[stackId] = newStack
+
+	return stackId, newStack
+}
+
+func MoveItemStack(stackId uuid.UUID, newLocation rl.Vector2, newSection StackLocation) error {
+	stack, ok := itemStacks[stackId]
+
+	if !ok {
+		return errors.New("no-item-stack")
+	}
+
+	stack.InventorySlot = newLocation
+	stack.Section = newSection
+
+	return nil
+}
+
+func GetItemStackAtInventorySlot(slot rl.Vector2, section StackLocation) (uuid.UUID, *ItemStack, error) {
+
+	for id, stack := range itemStacks {
+		if stack.Section == section {
+			if stack.InventorySlot == slot {
+				return id, stack, nil
+			}
+		}
+	}
+
+	return uuid.UUID{}, &ItemStack{}, errors.New("no-stack-at-slot")
+}
+
+func DrawItemStacksToConsole() {
+	fmt.Println("###START ITEM STACKS")
+	for _, i := range itemStacks {
+		if i.Section == SL_HOTBAR {
+			fmt.Println("In Hotbar")
+		} else if i.Section == SL_INVENTORY {
+			fmt.Println("In Inventory")
+		}
+
+	}
+	fmt.Println("###END ITEM STACKS")
 }
