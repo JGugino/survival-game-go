@@ -1,31 +1,31 @@
-package handlers
+package main
 
 import (
 	"fmt"
 	"math"
 
 	"github.com/JGugino/survival-game-go/entities"
+	"github.com/JGugino/survival-game-go/handlers"
 	"github.com/JGugino/survival-game-go/utils"
-	"github.com/JGugino/survival-game-go/world"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 type Game struct {
-	Generator       *world.WorldGenerator
+	Generator       *handlers.WorldGenerator
 	Camera          *rl.Camera2D
 	CurrentPlayer   *entities.Player
-	PlayerInventory *Inventory
-	DebugPanel      *utils.Debug
+	PlayerInventory *handlers.Inventory
+	DebugPanel      *handlers.Debug
 }
 
 func (g *Game) Init() {
 	//Load Textures
-	world.LoadNewTextureMap("world-tiles", "assets/world_tiles.png", 16)
-	world.LoadNewTextureMap("world-objects", "assets/world_objects.png", 16)
-	world.LoadNewTextureMap("items", "assets/items.png", 16)
+	utils.LoadNewTextureMap("world-tiles", "assets/world_tiles.png", 16)
+	utils.LoadNewTextureMap("world-objects", "assets/world_objects.png", 16)
+	utils.LoadNewTextureMap("items", "assets/items.png", 16)
 
 	//Initialize all game items
-	world.InitItemMap()
+	utils.InitItemMap()
 
 	//Generate a new world and spawn point
 	g.Generator.GenerateNewWorldNoiseImage(int(rl.GetRandomValue(0, 20)), int(rl.GetRandomValue(0, 20)), 2)
@@ -40,12 +40,12 @@ func (g *Game) Init() {
 	g.CurrentPlayer.MoveToWorldPosition(g.Generator.SpawnPoint)
 
 	//TEST - Give the player a pickaxe in the hotbar and seed in the inventory
-	g.PlayerInventory.AddItemToHotbar(0, world.I_PICKAXE)
-	g.PlayerInventory.AddItemToInventory(world.I_SEEDS)
+	g.PlayerInventory.AddItemToHotbar(0, utils.I_PICKAXE)
+	g.PlayerInventory.AddItemToInventory(utils.I_SEEDS)
 }
 
 func (g *Game) CleanUp() {
-	world.UnloadTextureMaps()
+	utils.UnloadTextureMaps()
 }
 
 func (g *Game) HandleInput() {
@@ -62,7 +62,7 @@ func (g *Game) HandleInput() {
 			return
 		}
 
-		activeHotbarSlotItem, err := world.GetItemByItemId(g.PlayerInventory.Hotbar[g.PlayerInventory.SelectedHotbarSlot])
+		activeHotbarSlotItem, err := utils.GetItemByItemId(g.PlayerInventory.Hotbar[g.PlayerInventory.SelectedHotbarSlot])
 
 		if err != nil {
 			return
@@ -89,7 +89,7 @@ func (g *Game) Update() {
 
 	g.Camera.Target = g.CurrentPlayer.Position
 
-	for _, i := range world.WorldItems {
+	for _, i := range utils.WorldItems {
 
 		colliding, _ := i.HandleItemCollision(rl.Rectangle{X: g.CurrentPlayer.Position.X, Y: g.CurrentPlayer.Position.Y, Width: float32(g.CurrentPlayer.Width), Height: float32(g.CurrentPlayer.Height)})
 
@@ -101,7 +101,7 @@ func (g *Game) Update() {
 				return
 			}
 
-			err = world.RemoveWorldItem(i.Id)
+			err = utils.RemoveWorldItem(i.Id)
 
 			if err != nil {
 				return
@@ -124,7 +124,7 @@ func (g *Game) Draw() {
 
 	g.Generator.DrawWorld()
 	g.CurrentPlayer.Draw()
-	world.DrawWorldItems()
+	utils.DrawWorldItems()
 
 	rl.EndMode2D()
 

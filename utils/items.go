@@ -1,4 +1,4 @@
-package world
+package utils
 
 import (
 	"errors"
@@ -12,6 +12,8 @@ type ItemId int32
 type ItemType int32
 
 type StackLocation int8
+
+type MineLevel int16
 
 const (
 	//Stack Locations
@@ -30,6 +32,11 @@ const (
 	ITEM   ItemType = 0
 	TOOL   ItemType = 1
 	WEAPON ItemType = 2
+
+	//Mining Levels
+	ML_LOW  MineLevel = 0
+	ML_MED  MineLevel = 1
+	ML_HIGH MineLevel = 2
 )
 
 type Item struct {

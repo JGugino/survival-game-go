@@ -1,4 +1,4 @@
-package world
+package utils
 
 import (
 	"errors"

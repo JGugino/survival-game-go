@@ -1,15 +1,14 @@
-package utils
+package handlers
 
 import (
 	"fmt"
 
 	"github.com/JGugino/survival-game-go/entities"
-	"github.com/JGugino/survival-game-go/world"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 type Debug struct {
-	Generator        *world.WorldGenerator
+	Generator        *WorldGenerator
 	CurrentPlayer    *entities.Player
 	DebugOpen        bool
 	DebugFontSize    float32

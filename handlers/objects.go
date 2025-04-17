@@ -1,9 +1,10 @@
-package world
+package handlers
 
 import (
 	"errors"
 	"fmt"
 
+	"github.com/JGugino/survival-game-go/utils"
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/google/uuid"
 )
@@ -28,7 +29,7 @@ func (o *Objects) InitObjectGrid(mapWidth int, mapHeight int, cellSize int) {
 	}
 }
 
-func (o *Objects) CreateNewObject(object ObjectId, position rl.Vector2, health int, color rl.Color, movable bool, mineable bool, mineLevel MineLevel, droppedItem Item) uuid.UUID {
+func (o *Objects) CreateNewObject(object ObjectId, position rl.Vector2, health int, color rl.Color, movable bool, mineable bool, mineLevel utils.MineLevel, droppedItem utils.Item) uuid.UUID {
 
 	objId := uuid.New()
 
@@ -66,7 +67,7 @@ func (o *Objects) DamageObject(objId uuid.UUID, damage int) error {
 	obj.Health -= damage
 
 	if obj.Health <= 0 {
-		_, _, err := NewWorldItem(obj.DroppedItem.Id, rl.Vector2{X: (obj.Position.X * float32(o.CellSize)), Y: (obj.Position.Y * float32(o.CellSize))})
+		_, _, err := utils.NewWorldItem(obj.DroppedItem.Id, rl.Vector2{X: (obj.Position.X * float32(o.CellSize)), Y: (obj.Position.Y * float32(o.CellSize))})
 
 		if err != nil {
 
@@ -98,7 +99,7 @@ func (o *Objects) GetObjectAtWorldPosition(position rl.Vector2) (uuid.UUID, *Obj
 func (o *Objects) DrawObjects(x int, y int) {
 	tile := o.ObjectGrid[x][y]
 
-	tMap, err := GetTextureMap("world-objects")
+	tMap, err := utils.GetTextureMap("world-objects")
 
 	objectLocation := rl.Vector2{X: float32(x * o.CellSize), Y: float32(y * o.CellSize)}
 

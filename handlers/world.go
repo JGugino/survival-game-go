@@ -1,8 +1,9 @@
-package world
+package handlers
 
 import (
 	"fmt"
 
+	"github.com/JGugino/survival-game-go/utils"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -37,13 +38,13 @@ func (g *WorldGenerator) InitWorldGrid() {
 			if tileType == STONE {
 				test := rl.GetRandomValue(0, 6)
 				if test > 5 {
-					rock, err := GetItemByName("rock")
+					rock, err := utils.GetItemByName("rock")
 
 					if err != nil {
 						return
 					}
 
-					g.ObjectManager.CreateNewObject(ROCK, rl.Vector2{X: float32(x), Y: float32(y)}, 60, rl.DarkGray, false, true, ML_MED, *rock)
+					g.ObjectManager.CreateNewObject(ROCK, rl.Vector2{X: float32(x), Y: float32(y)}, 60, rl.DarkGray, false, true, utils.ML_MED, *rock)
 				}
 			}
 
@@ -54,7 +55,7 @@ func (g *WorldGenerator) InitWorldGrid() {
 }
 
 func (g *WorldGenerator) DrawWorld() {
-	tMap, err := GetTextureMap("world-tiles")
+	tMap, err := utils.GetTextureMap("world-tiles")
 
 	if err != nil {
 		fmt.Println(err)

@@ -5,10 +5,17 @@ import (
 	"fmt"
 
 	"github.com/JGugino/survival-game-go/utils"
-	"github.com/JGugino/survival-game-go/world"
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/google/uuid"
 )
+
+type Container struct {
+	Width        int
+	Height       int
+	ScreenWidth  int
+	ScreenHeight int
+	ItemGrid     [9][4]utils.ItemId
+}
 
 type InventoryPosition struct {
 	InventoryXPadding    int
@@ -26,18 +33,18 @@ type InventoryPosition struct {
 
 type Inventory struct {
 	HotbarSize            int
-	MainInventory         utils.Container
-	Hotbar                [9]world.ItemId
+	MainInventory         Container
+	Hotbar                [9]utils.ItemId
 	CellSize              int
 	SelectedHotbarSlot    int
 	Visible               bool
 	Positioning           InventoryPosition
 	HoldingItem           bool
 	SelectedInventoryItem struct {
-		itemId   world.ItemId
+		itemId   utils.ItemId
 		stackId  uuid.UUID
 		startPos rl.Vector2
-		section  world.StackLocation
+		section  utils.StackLocation
 	}
 	Hover struct {
 		InventoryHovering  bool
@@ -56,7 +63,7 @@ func (i *Inventory) DrawInventory() {
 	// Inventory background
 	rl.DrawRectangleRounded(rl.Rectangle{X: float32(offsetX), Y: float32(offsetY - i.Positioning.InventoryYOffset), Width: float32(i.MainInventory.ScreenWidth + i.Positioning.InventoryXPadding), Height: float32(i.MainInventory.ScreenHeight + i.Positioning.InventoryYPadding)}, 0.1, 1, transparentWhite)
 
-	tMap, err := world.GetTextureMap("items")
+	tMap, err := utils.GetTextureMap("items")
 
 	if err != nil {
 		return
@@ -77,12 +84,12 @@ func (i *Inventory) DrawInventory() {
 
 			//Inventory slot items
 			if i.MainInventory.ItemGrid[x][y] != 0 {
-				slotItem, err := world.GetItemByItemId(i.MainInventory.ItemGrid[x][y])
+				slotItem, err := utils.GetItemByItemId(i.MainInventory.ItemGrid[x][y])
 				if err != nil {
 					return
 				}
 
-				_, stack, err := world.GetItemStackAtInventorySlot(rl.Vector2{X: float32(x), Y: float32(y)}, world.SL_INVENTORY)
+				_, stack, err := utils.GetItemStackAtInventorySlot(rl.Vector2{X: float32(x), Y: float32(y)}, utils.SL_INVENTORY)
 
 				if err != nil {
 					return
@@ -104,7 +111,7 @@ func (i *Inventory) DrawHotbar() {
 	// Hotbar background
 	rl.DrawRectangleRounded(rl.Rectangle{X: float32(i.Positioning.HotbarXOffset), Y: float32(i.Positioning.HotbarYOffset), Width: float32(i.HotbarSize)*float32(i.CellSize) + float32(i.Positioning.HotbarXPadding), Height: float32(i.CellSize) + float32(i.Positioning.HotbarYPadding)}, 0.1, 1, transparentWhite)
 
-	tMap, err := world.GetTextureMap("items")
+	tMap, err := utils.GetTextureMap("items")
 
 	if err != nil {
 		return
@@ -122,12 +129,12 @@ func (i *Inventory) DrawHotbar() {
 
 		//Slot item
 		if i.Hotbar[x] != 0 {
-			slotItem, err := world.GetItemByItemId(i.Hotbar[x])
+			slotItem, err := utils.GetItemByItemId(i.Hotbar[x])
 			if err != nil {
 				return
 			}
 
-			_, stack, err := world.GetItemStackAtInventorySlot(rl.Vector2{X: float32(x), Y: float32(0)}, world.SL_HOTBAR)
+			_, stack, err := utils.GetItemStackAtInventorySlot(rl.Vector2{X: float32(x), Y: float32(0)}, utils.SL_HOTBAR)
 
 			itemPosition := rl.Vector2{X: float32(slotXOffset + int32(i.CellSize)/2), Y: float32(slotYOffset + int32(i.CellSize)/2)}
 
@@ -143,13 +150,13 @@ func (i *Inventory) DrawHotbar() {
 
 func (i *Inventory) DrawHoldingItem() {
 	if i.HoldingItem {
-		tMap, err := world.GetTextureMap("items")
+		tMap, err := utils.GetTextureMap("items")
 
 		if err != nil {
 			return
 		}
 
-		item, err := world.GetItemByItemId(i.SelectedInventoryItem.itemId)
+		item, err := utils.GetItemByItemId(i.SelectedInventoryItem.itemId)
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -161,11 +168,11 @@ func (i *Inventory) DrawHoldingItem() {
 	}
 }
 
-func (i *Inventory) AddItemToInventory(itemId world.ItemId) error {
+func (i *Inventory) AddItemToInventory(itemId utils.ItemId) error {
 	//Check if item already in inventory
-	exists, gridPos := i.ItemExistsInsideInventory(itemId, world.SL_INVENTORY)
+	exists, gridPos := i.ItemExistsInsideInventory(itemId, utils.SL_INVENTORY)
 
-	item, err := world.GetItemByItemId(itemId)
+	item, err := utils.GetItemByItemId(itemId)
 
 	if err != nil {
 		return err
@@ -173,7 +180,7 @@ func (i *Inventory) AddItemToInventory(itemId world.ItemId) error {
 
 	//If it is add to the existing items ItemStack if not over max stack
 	if exists {
-		_, stack, err := world.GetItemStackAtInventorySlot(gridPos, world.SL_INVENTORY)
+		_, stack, err := utils.GetItemStackAtInventorySlot(gridPos, utils.SL_INVENTORY)
 
 		if err != nil {
 			return err
@@ -194,25 +201,25 @@ func (i *Inventory) AddItemToInventory(itemId world.ItemId) error {
 	return nil
 }
 
-func (i *Inventory) AddItemToOpenSlot(itemId world.ItemId) error {
+func (i *Inventory) AddItemToOpenSlot(itemId utils.ItemId) error {
 	slot, err := i.FindOpenInventorySlot()
 
 	if err != nil {
 		return err
 	}
 
-	world.CreateNewItemStack(slot, itemId, world.SL_INVENTORY)
+	utils.CreateNewItemStack(slot, itemId, utils.SL_INVENTORY)
 	i.MainInventory.ItemGrid[int(slot.X)][int(slot.Y)] = itemId
 	return nil
 }
 
-func (i *Inventory) ItemExistsInsideInventory(itemId world.ItemId, section world.StackLocation) (itemExists bool, gridPosition rl.Vector2) {
-	if section == world.SL_INVENTORY {
+func (i *Inventory) ItemExistsInsideInventory(itemId utils.ItemId, section utils.StackLocation) (itemExists bool, gridPosition rl.Vector2) {
+	if section == utils.SL_INVENTORY {
 		for y := range i.MainInventory.Height {
 			for x := range i.MainInventory.Width {
 				if i.MainInventory.ItemGrid[x][y] == itemId {
-					_, stack, _ := world.GetItemStackAtInventorySlot(rl.Vector2{X: float32(x), Y: float32(y)}, section)
-					item, _ := world.GetItemByItemId(itemId)
+					_, stack, _ := utils.GetItemStackAtInventorySlot(rl.Vector2{X: float32(x), Y: float32(y)}, section)
+					item, _ := utils.GetItemByItemId(itemId)
 
 					if stack.StackSize < item.MaxStack {
 						return true, rl.Vector2{X: float32(x), Y: float32(y)}
@@ -220,11 +227,11 @@ func (i *Inventory) ItemExistsInsideInventory(itemId world.ItemId, section world
 				}
 			}
 		}
-	} else if section == world.SL_HOTBAR {
+	} else if section == utils.SL_HOTBAR {
 		for x := range i.HotbarSize {
 			if i.Hotbar[x] == itemId {
-				_, stack, _ := world.GetItemStackAtInventorySlot(rl.Vector2{X: float32(x), Y: float32(0)}, section)
-				item, _ := world.GetItemByItemId(itemId)
+				_, stack, _ := utils.GetItemStackAtInventorySlot(rl.Vector2{X: float32(x), Y: float32(0)}, section)
+				item, _ := utils.GetItemByItemId(itemId)
 
 				if stack.StackSize < item.MaxStack {
 					return true, rl.Vector2{X: float32(x), Y: float32(0)}
@@ -248,8 +255,8 @@ func (i *Inventory) FindOpenInventorySlot() (rl.Vector2, error) {
 	return rl.Vector2{}, errors.New("no-open-slot")
 }
 
-func (i *Inventory) AddItemToHotbar(slot int, itemId world.ItemId) {
-	world.CreateNewItemStack(rl.Vector2{X: float32(slot), Y: 0}, itemId, world.SL_HOTBAR)
+func (i *Inventory) AddItemToHotbar(slot int, itemId utils.ItemId) {
+	utils.CreateNewItemStack(rl.Vector2{X: float32(slot), Y: 0}, itemId, utils.SL_HOTBAR)
 	i.Hotbar[slot] = itemId
 }
 
@@ -273,13 +280,13 @@ func (i *Inventory) InputHandler() {
 	i.HotbarInputHandler()
 }
 
-func (i *Inventory) MoveItemToInventoryGridPosition(gridPos rl.Vector2, itemId world.ItemId, section world.StackLocation) {
+func (i *Inventory) MoveItemToInventoryGridPosition(gridPos rl.Vector2, itemId utils.ItemId, section utils.StackLocation) {
 	x := int(gridPos.X)
 	y := int(gridPos.Y)
 
-	if section == world.SL_INVENTORY {
+	if section == utils.SL_INVENTORY {
 		i.MainInventory.ItemGrid[x][y] = itemId
-	} else if section == world.SL_HOTBAR {
+	} else if section == utils.SL_HOTBAR {
 		i.Hotbar[x] = itemId
 	}
 }
@@ -314,11 +321,11 @@ func (i *Inventory) InventoryInputHandler() {
 						if i.MainInventory.ItemGrid[x][y] != 0 {
 							//Pick up item if not currently holding something
 							if !i.HoldingItem {
-								i.PickupItemFromInventory(rl.Vector2{X: float32(x), Y: float32(y)}, world.SL_INVENTORY)
+								i.PickupItemFromInventory(rl.Vector2{X: float32(x), Y: float32(y)}, utils.SL_INVENTORY)
 								return
 							} else {
 								//Current item stack at the selected main inventory slot
-								currentStackId, currentItemStack, err := world.GetItemStackAtInventorySlot(rl.Vector2{X: float32(x), Y: float32(y)}, world.SL_INVENTORY)
+								currentStackId, currentItemStack, err := utils.GetItemStackAtInventorySlot(rl.Vector2{X: float32(x), Y: float32(y)}, utils.SL_INVENTORY)
 
 								if err != nil {
 									fmt.Println(err)
@@ -326,26 +333,26 @@ func (i *Inventory) InventoryInputHandler() {
 								}
 
 								//Move item stack from one inventory spot to another
-								if i.SelectedInventoryItem.section == world.SL_INVENTORY {
+								if i.SelectedInventoryItem.section == utils.SL_INVENTORY {
 									//Move stack and and add id to starting position of the currently held item
-									world.MoveItemStack(currentStackId, i.SelectedInventoryItem.startPos, world.SL_INVENTORY)
-									i.MoveItemToInventoryGridPosition(i.SelectedInventoryItem.startPos, currentItemStack.ItemId, world.SL_INVENTORY)
+									utils.MoveItemStack(currentStackId, i.SelectedInventoryItem.startPos, utils.SL_INVENTORY)
+									i.MoveItemToInventoryGridPosition(i.SelectedInventoryItem.startPos, currentItemStack.ItemId, utils.SL_INVENTORY)
 
-								} else if i.SelectedInventoryItem.section == world.SL_HOTBAR { //Move an item stack from the hotbar to the inventory
+								} else if i.SelectedInventoryItem.section == utils.SL_HOTBAR { //Move an item stack from the hotbar to the inventory
 									//Move stack and and add id to starting position of the currently held item
-									world.MoveItemStack(currentStackId, i.SelectedInventoryItem.startPos, world.SL_HOTBAR)
-									i.MoveItemToInventoryGridPosition(i.SelectedInventoryItem.startPos, currentItemStack.ItemId, world.SL_HOTBAR)
+									utils.MoveItemStack(currentStackId, i.SelectedInventoryItem.startPos, utils.SL_HOTBAR)
+									i.MoveItemToInventoryGridPosition(i.SelectedInventoryItem.startPos, currentItemStack.ItemId, utils.SL_HOTBAR)
 								}
 
 								//Move currently held item to selected slot
-								i.MoveItemToInventoryGridPosition(rl.Vector2{X: float32(x), Y: float32(y)}, i.SelectedInventoryItem.itemId, world.SL_INVENTORY)
-								world.MoveItemStack(i.SelectedInventoryItem.stackId, rl.Vector2{X: float32(x), Y: float32(y)}, world.SL_INVENTORY)
+								i.MoveItemToInventoryGridPosition(rl.Vector2{X: float32(x), Y: float32(y)}, i.SelectedInventoryItem.itemId, utils.SL_INVENTORY)
+								utils.MoveItemStack(i.SelectedInventoryItem.stackId, rl.Vector2{X: float32(x), Y: float32(y)}, utils.SL_INVENTORY)
 
 								i.ResetHoldingItem()
 							}
 						} else {
 							if i.HoldingItem {
-								stackId, _, err := world.GetItemStackAtInventorySlot(i.SelectedInventoryItem.startPos, i.SelectedInventoryItem.section)
+								stackId, _, err := utils.GetItemStackAtInventorySlot(i.SelectedInventoryItem.startPos, i.SelectedInventoryItem.section)
 
 								if err != nil {
 									fmt.Println(err)
@@ -354,8 +361,8 @@ func (i *Inventory) InventoryInputHandler() {
 
 								newLocation := rl.Vector2{X: float32(x), Y: float32(y)}
 
-								world.MoveItemStack(stackId, newLocation, world.SL_INVENTORY)
-								i.MoveItemToInventoryGridPosition(rl.Vector2{X: float32(x), Y: float32(y)}, i.SelectedInventoryItem.itemId, world.SL_INVENTORY)
+								utils.MoveItemStack(stackId, newLocation, utils.SL_INVENTORY)
+								i.MoveItemToInventoryGridPosition(rl.Vector2{X: float32(x), Y: float32(y)}, i.SelectedInventoryItem.itemId, utils.SL_INVENTORY)
 
 								i.ResetHoldingItem()
 							}
@@ -422,11 +429,11 @@ func (i *Inventory) HotbarInputHandler() {
 					if i.Hotbar[x] != 0 {
 						//Pick up item if not currently holding something
 						if !i.HoldingItem {
-							i.PickupItemFromInventory(rl.Vector2{X: float32(x), Y: float32(0)}, world.SL_HOTBAR)
+							i.PickupItemFromInventory(rl.Vector2{X: float32(x), Y: float32(0)}, utils.SL_HOTBAR)
 							return
 						} else {
 							//Current item stack at the selected hotbar slot
-							currentStackId, currentItemStack, err := world.GetItemStackAtInventorySlot(rl.Vector2{X: float32(x), Y: float32(0)}, world.SL_HOTBAR)
+							currentStackId, currentItemStack, err := utils.GetItemStackAtInventorySlot(rl.Vector2{X: float32(x), Y: float32(0)}, utils.SL_HOTBAR)
 
 							if err != nil {
 								fmt.Println(err)
@@ -434,26 +441,26 @@ func (i *Inventory) HotbarInputHandler() {
 							}
 
 							//Move item stack from an inventory slot to the hotbar
-							if i.SelectedInventoryItem.section == world.SL_INVENTORY {
+							if i.SelectedInventoryItem.section == utils.SL_INVENTORY {
 								//Move stack and and add id to starting position of the currently held item
-								world.MoveItemStack(currentStackId, i.SelectedInventoryItem.startPos, world.SL_INVENTORY)
-								i.MoveItemToInventoryGridPosition(i.SelectedInventoryItem.startPos, currentItemStack.ItemId, world.SL_INVENTORY)
+								utils.MoveItemStack(currentStackId, i.SelectedInventoryItem.startPos, utils.SL_INVENTORY)
+								i.MoveItemToInventoryGridPosition(i.SelectedInventoryItem.startPos, currentItemStack.ItemId, utils.SL_INVENTORY)
 
-							} else if i.SelectedInventoryItem.section == world.SL_HOTBAR { //Move an item stack from one hotbar slot to another
+							} else if i.SelectedInventoryItem.section == utils.SL_HOTBAR { //Move an item stack from one hotbar slot to another
 								//Move stack and and add id to starting position of the currently held item
-								world.MoveItemStack(currentStackId, i.SelectedInventoryItem.startPos, world.SL_HOTBAR)
-								i.MoveItemToInventoryGridPosition(i.SelectedInventoryItem.startPos, currentItemStack.ItemId, world.SL_HOTBAR)
+								utils.MoveItemStack(currentStackId, i.SelectedInventoryItem.startPos, utils.SL_HOTBAR)
+								i.MoveItemToInventoryGridPosition(i.SelectedInventoryItem.startPos, currentItemStack.ItemId, utils.SL_HOTBAR)
 							}
 
 							//Move currently held item to selected slot
-							i.MoveItemToInventoryGridPosition(rl.Vector2{X: float32(x), Y: float32(0)}, i.SelectedInventoryItem.itemId, world.SL_HOTBAR)
-							world.MoveItemStack(i.SelectedInventoryItem.stackId, rl.Vector2{X: float32(x), Y: float32(0)}, world.SL_HOTBAR)
+							i.MoveItemToInventoryGridPosition(rl.Vector2{X: float32(x), Y: float32(0)}, i.SelectedInventoryItem.itemId, utils.SL_HOTBAR)
+							utils.MoveItemStack(i.SelectedInventoryItem.stackId, rl.Vector2{X: float32(x), Y: float32(0)}, utils.SL_HOTBAR)
 
 							i.ResetHoldingItem()
 						}
 					} else {
 						if i.HoldingItem {
-							stackId, _, err := world.GetItemStackAtInventorySlot(i.SelectedInventoryItem.startPos, i.SelectedInventoryItem.section)
+							stackId, _, err := utils.GetItemStackAtInventorySlot(i.SelectedInventoryItem.startPos, i.SelectedInventoryItem.section)
 
 							if err != nil {
 								fmt.Println(err)
@@ -462,8 +469,8 @@ func (i *Inventory) HotbarInputHandler() {
 
 							newLocation := rl.Vector2{X: float32(x), Y: float32(0)}
 
-							world.MoveItemStack(stackId, newLocation, world.SL_HOTBAR)
-							i.MoveItemToInventoryGridPosition(rl.Vector2{X: float32(x), Y: float32(0)}, i.SelectedInventoryItem.itemId, world.SL_HOTBAR)
+							utils.MoveItemStack(stackId, newLocation, utils.SL_HOTBAR)
+							i.MoveItemToInventoryGridPosition(rl.Vector2{X: float32(x), Y: float32(0)}, i.SelectedInventoryItem.itemId, utils.SL_HOTBAR)
 
 							i.ResetHoldingItem()
 						}
@@ -474,8 +481,8 @@ func (i *Inventory) HotbarInputHandler() {
 	}
 }
 
-func (i *Inventory) PickupItemFromInventory(position rl.Vector2, section world.StackLocation) {
-	stackId, stack, err := world.GetItemStackAtInventorySlot(position, section)
+func (i *Inventory) PickupItemFromInventory(position rl.Vector2, section utils.StackLocation) {
+	stackId, stack, err := utils.GetItemStackAtInventorySlot(position, section)
 
 	if err != nil {
 		fmt.Println(err)
@@ -487,9 +494,9 @@ func (i *Inventory) PickupItemFromInventory(position rl.Vector2, section world.S
 	i.SelectedInventoryItem.section = section
 	i.SelectedInventoryItem.startPos = position
 
-	if section == world.SL_INVENTORY {
+	if section == utils.SL_INVENTORY {
 		i.MainInventory.ItemGrid[int(position.X)][int(position.Y)] = 0
-	} else if section == world.SL_HOTBAR {
+	} else if section == utils.SL_HOTBAR {
 		i.Hotbar[int(position.X)] = 0
 	}
 

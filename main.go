@@ -3,8 +3,6 @@ package main
 import (
 	"github.com/JGugino/survival-game-go/entities"
 	"github.com/JGugino/survival-game-go/handlers"
-	"github.com/JGugino/survival-game-go/utils"
-	"github.com/JGugino/survival-game-go/world"
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/google/uuid"
 )
@@ -30,12 +28,12 @@ func main() {
 
 	rl.SetTargetFPS(TARGET_FPS)
 
-	worldGenerator := world.WorldGenerator{
+	worldGenerator := handlers.WorldGenerator{
 		CellSize:  DEFAULT_CELL_SIZE,
 		MapWidth:  DEFAULT_MAP_WIDTH,
 		MapHeight: DEFAULT_MAP_HEIGHT,
-		ObjectManager: world.Objects{
-			Objs: make(map[uuid.UUID]*world.Object, 0),
+		ObjectManager: handlers.Objects{
+			Objs: make(map[uuid.UUID]*handlers.Object, 0),
 		},
 	}
 
@@ -71,7 +69,7 @@ func main() {
 			HotbarHovering:     false,
 			HotbarHoverSlot:    rl.Vector2Zero(),
 		},
-		MainInventory: utils.Container{Width: 9, Height: 4, ScreenWidth: 9 * DEFAULT_CELL_SIZE, ScreenHeight: 4 * DEFAULT_CELL_SIZE},
+		MainInventory: handlers.Container{Width: 9, Height: 4, ScreenWidth: 9 * DEFAULT_CELL_SIZE, ScreenHeight: 4 * DEFAULT_CELL_SIZE},
 		Positioning: handlers.InventoryPosition{
 			InventoryYOffset:     40,
 			InventoryXPadding:    10,
@@ -87,7 +85,7 @@ func main() {
 		},
 	}
 
-	debug := utils.Debug{
+	debug := handlers.Debug{
 		DebugOpen:        false,
 		DebugFontSize:    19,
 		DebugTextSpacing: 30,
@@ -99,7 +97,7 @@ func main() {
 		CurrentPlayer:    &player,
 	}
 
-	game := handlers.Game{
+	game := Game{
 		Generator:       &worldGenerator,
 		Camera:          &mainCamera,
 		CurrentPlayer:   &player,
