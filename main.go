@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/JGugino/survival-game-go/entities"
 	"github.com/JGugino/survival-game-go/handlers"
+	"github.com/JGugino/survival-game-go/utils"
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/google/uuid"
 )
@@ -28,6 +29,9 @@ func main() {
 
 	rl.SetTargetFPS(TARGET_FPS)
 
+	//TODO: Work on resizable window
+	//rl.SetWindowState(rl.FlagWindowResizable)
+
 	worldGenerator := handlers.WorldGenerator{
 		CellSize:  DEFAULT_CELL_SIZE,
 		MapWidth:  DEFAULT_MAP_WIDTH,
@@ -43,14 +47,14 @@ func main() {
 		Speed:     2,
 		Width:     DEFAULT_CELL_SIZE,
 		Height:    DEFAULT_CELL_SIZE,
-		Direction: entities.UP,
+		Direction: utils.UP,
 		Moving:    false}
 
 	mainCamera := rl.Camera2D{
 		Offset:   rl.Vector2{X: WINDOW_WIDTH / 2, Y: WINDOW_HEIGHT / 2},
 		Target:   player.Position,
 		Rotation: 0,
-		Zoom:     1.2,
+		Zoom:     1.4,
 	}
 
 	inv := handlers.Inventory{

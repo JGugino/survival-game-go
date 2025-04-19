@@ -23,6 +23,7 @@ func (g *Game) Init() {
 	utils.LoadNewTextureMap("world-tiles", "assets/world_tiles.png", 16)
 	utils.LoadNewTextureMap("world-objects", "assets/world_objects.png", 16)
 	utils.LoadNewTextureMap("items", "assets/items.png", 16)
+	utils.LoadNewTextureMap("player", "assets/player.png", 16)
 
 	//Initialize all game items
 	utils.InitItemMap()

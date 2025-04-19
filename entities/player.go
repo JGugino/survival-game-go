@@ -1,14 +1,8 @@
 package entities
 
-import rl "github.com/gen2brain/raylib-go/raylib"
-
-type FacingDirection int32
-
-const (
-	UP    FacingDirection = 0
-	DOWN  FacingDirection = 1
-	LEFT  FacingDirection = 2
-	RIGHT FacingDirection = 3
+import (
+	"github.com/JGugino/survival-game-go/utils"
+	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 type Player struct {
@@ -17,13 +11,10 @@ type Player struct {
 	Speed     float32
 	Width     int
 	Height    int
-	Direction FacingDirection
+	Direction utils.FacingDirection
 	Moving    bool
 }
 
-func (p *Player) Init() {
-
-}
 func (p *Player) Update(worldWidth int, worldHeight int) {
 	//Limit X
 	if p.Position.X <= 0 {
@@ -45,19 +36,19 @@ func (p *Player) Update(worldWidth int, worldHeight int) {
 func (p *Player) HandleInput() {
 	if rl.IsKeyDown(rl.KeyW) {
 		p.Position.Y -= p.Speed
-		p.Direction = UP
+		p.Direction = utils.UP
 		p.Moving = true
 	} else if rl.IsKeyDown(rl.KeyA) {
 		p.Position.X -= p.Speed
-		p.Direction = LEFT
+		p.Direction = utils.LEFT
 		p.Moving = true
 	} else if rl.IsKeyDown(rl.KeyS) {
 		p.Position.Y += p.Speed
-		p.Direction = DOWN
+		p.Direction = utils.DOWN
 		p.Moving = true
 	} else if rl.IsKeyDown(rl.KeyD) {
 		p.Position.X += p.Speed
-		p.Direction = RIGHT
+		p.Direction = utils.RIGHT
 		p.Moving = true
 	} else {
 		if p.Moving {
@@ -66,7 +57,23 @@ func (p *Player) HandleInput() {
 	}
 }
 func (p *Player) Draw() {
-	rl.DrawRectangleRounded(rl.Rectangle{Width: float32(p.Width), Height: float32(p.Height), X: p.Position.X, Y: p.Position.Y}, 0.1, 1, rl.Yellow)
+	tMap, err := utils.GetTextureMap("player")
+
+	if err != nil {
+		return
+	}
+
+	position := rl.Vector2{X: p.Position.X, Y: p.Position.Y}
+	if p.Direction == utils.DOWN {
+		tMap.DrawTextureAtPositionWithScaling(rl.Vector2{X: 0, Y: 0}, position, p.Width)
+	} else if p.Direction == utils.UP {
+		tMap.DrawTextureAtPositionWithScaling(rl.Vector2{X: 1, Y: 0}, position, p.Width)
+	} else if p.Direction == utils.LEFT {
+		tMap.DrawTextureAtPositionWithScaling(rl.Vector2{X: 2, Y: 0}, position, p.Width)
+	} else if p.Direction == utils.RIGHT {
+		tMap.DrawTextureAtPositionWithScaling(rl.Vector2{X: 3, Y: 0}, position, p.Width)
+	}
+
 }
 
 func (p *Player) MoveToWorldPosition(position rl.Vector2) {
