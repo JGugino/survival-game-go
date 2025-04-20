@@ -9,6 +9,7 @@ import (
 type CraftingRecipe struct {
 	Id          string
 	RecipeItems []RecipeItem
+	OutputItem  utils.ItemId
 }
 
 type RecipeItem struct {
@@ -27,17 +28,19 @@ func (c *Crafting) InitCraftingRecipes() {
 			RecipeItem{Id: utils.I_ROCK, Quantity: 3},
 			RecipeItem{Id: utils.I_WOOD, Quantity: 2},
 		},
+		OutputItem: utils.I_PICKAXE,
 	}
 }
 
-func (c *Crafting) CanCraftItem(recipeId string) (canCaft bool, missingItems []RecipeItem, err error) {
+func (c *Crafting) CanCraftItem(recipeId string) (canCaft bool, foundStacks []*utils.ItemStack, missingItems []RecipeItem, err error) {
 	recipe, ok := c.CraftingRecipes[recipeId]
 
 	if !ok {
-		return false, []RecipeItem{}, errors.New("no-recipe")
+		return false, []*utils.ItemStack{}, []RecipeItem{}, errors.New("no-recipe")
 	}
 
 	missingItems = make([]RecipeItem, 0)
+	foundStacks = make([]*utils.ItemStack, 0)
 
 	for _, i := range recipe.RecipeItems {
 		_, stack, err := utils.GetItemStackByItemId(i.Id)
@@ -50,11 +53,13 @@ func (c *Crafting) CanCraftItem(recipeId string) (canCaft bool, missingItems []R
 			missingItems = append(missingItems, i)
 			continue
 		}
+
+		foundStacks = append(foundStacks, stack)
 	}
 
 	if len(missingItems) > 0 {
-		return false, missingItems, errors.New("missing-items")
+		return false, foundStacks, missingItems, errors.New("missing-items")
 	}
 
-	return true, missingItems, nil
+	return true, foundStacks, missingItems, nil
 }

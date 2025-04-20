@@ -36,8 +36,8 @@ func (g *WorldGenerator) InitWorldGrid() {
 			tileType := g.GetPixelType(pixelColor)
 
 			if tileType == STONE {
-				test := rl.GetRandomValue(0, 6)
-				if test > 5 {
+				test := rl.GetRandomValue(0, 40)
+				if test > 5 && test <= 18 {
 					rock, err := utils.GetItemByName("rock")
 
 					if err != nil {
@@ -45,6 +45,8 @@ func (g *WorldGenerator) InitWorldGrid() {
 					}
 
 					g.ObjectManager.CreateNewObject(ROCK, rl.Vector2{X: float32(x), Y: float32(y)}, 60, rl.DarkGray, false, true, utils.ML_MED, *rock)
+				} else if test >= 39 {
+					utils.NewWorldItem(utils.I_ROCK, rl.Vector2{X: float32(x * g.CellSize), Y: float32(y * g.CellSize)})
 				}
 			}
 

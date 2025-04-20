@@ -236,6 +236,15 @@ func CreateNewItemStack(inventorySlot rl.Vector2, itemId ItemId, section StackLo
 	return stackId, newStack
 }
 
+func DeleteItemStack(stackId uuid.UUID) error {
+	if _, ok := itemStacks[stackId]; ok {
+		delete(itemStacks, stackId)
+		return nil
+	}
+
+	return errors.New("no-item-stack")
+}
+
 func MoveItemStack(stackId uuid.UUID, newLocation rl.Vector2, newSection StackLocation) error {
 	stack, ok := itemStacks[stackId]
 
@@ -272,6 +281,15 @@ func GetItemStackByItemId(itemId ItemId) (uuid.UUID, *ItemStack, error) {
 	return uuid.UUID{}, &ItemStack{}, errors.New("no-item-stack")
 }
 
+func RemoveItemsFromStack(stack *ItemStack, amount int) error {
+	if stack.StackSize < amount {
+		return errors.New("no-enough-items")
+	}
+
+	stack.StackSize -= amount
+
+	return nil
+}
 func DrawItemStacksToConsole() {
 	fmt.Println("###START ITEM STACKS")
 	for _, i := range itemStacks {

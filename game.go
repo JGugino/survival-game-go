@@ -38,10 +38,6 @@ func (g *Game) Init() {
 
 	//Moves the player to the world's spawn point
 	g.CurrentPlayer.MoveToWorldPosition(g.Generator.SpawnPoint)
-
-	//TEST - Give the player a pickaxe in the hotbar and seed in the inventory
-	g.PlayerInventory.AddItemToHotbar(0, utils.I_PICKAXE)
-	g.PlayerInventory.AddItemToInventory(utils.I_SEEDS)
 }
 
 func (g *Game) CleanUp() {
@@ -54,16 +50,10 @@ func (g *Game) HandleInput() {
 	g.DebugPanel.HandleInput()
 
 	if rl.IsKeyPressed(rl.KeyP) {
-		canCraft, missingItems, err := g.PlayerInventory.CraftingHandler.CanCraftItem("pickaxe")
+		err := g.PlayerInventory.CraftItem("pickaxe")
 
 		if err != nil {
-			fmt.Print("Missing items: ")
-			fmt.Println(missingItems)
 			return
-		}
-
-		if canCraft {
-			g.PlayerInventory.AddItemToInventory(utils.I_PICKAXE)
 		}
 	}
 

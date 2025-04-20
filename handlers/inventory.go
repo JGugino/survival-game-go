@@ -524,6 +524,34 @@ func (i *Inventory) PickupItemFromInventory(position rl.Vector2, section utils.S
 	i.HoldingItem = true
 }
 
+func (i *Inventory) CraftItem(recipeId string) error {
+	canCraft, foundStacks, missingItems, err := i.CraftingHandler.CanCraftItem(recipeId)
+
+	if err != nil {
+		fmt.Println(missingItems)
+		return err
+	}
+
+	if canCraft {
+		recipe, _ := i.CraftingHandler.CraftingRecipes[recipeId]
+
+		for x, r := range recipe.RecipeItems {
+			if foundStacks[x].ItemId == r.Id {
+				utils.RemoveItemsFromStack(foundStacks[x], r.Quantity)
+
+				if foundStacks[x].StackSize <= 0 {
+					i.MainInventory.ItemGrid[int32(foundStacks[x].InventorySlot.X)][int32(foundStacks[x].InventorySlot.Y)] = 0
+					utils.DeleteItemStack(foundStacks[x].Id)
+				}
+			}
+		}
+
+		i.AddItemToInventory(recipe.OutputItem)
+	}
+
+	return nil
+}
+
 func (i *Inventory) DrawInventoryToConsole() {
 	fmt.Println("###INVENTORY###")
 	for y := range i.MainInventory.Height {
@@ -549,6 +577,7 @@ func (i *Inventory) ClearInventory() {
 		}
 	}
 }
+
 func (i *Inventory) ClearHotbar() {
 	for x := range i.HotbarSize {
 		i.Hotbar[x] = 0
