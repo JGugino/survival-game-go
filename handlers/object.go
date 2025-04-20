@@ -20,6 +20,7 @@ type Object struct {
 	ObjectId    int
 	Position    rl.Vector2
 	Health      int
+	MaxHealth   int
 	Color       rl.Color
 	Movable     bool
 	Mineable    bool

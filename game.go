@@ -58,36 +58,44 @@ func (g *Game) HandleInput() {
 	}
 
 	if rl.IsMouseButtonPressed(rl.MouseButtonLeft) {
-		worldPos := rl.GetScreenToWorld2D(rl.Vector2{X: float32(math.Round(float64(rl.GetMouseX()))), Y: float32(float64(rl.GetMouseY()))}, (*g.Camera))
+		if !g.PlayerInventory.Visible {
+			worldPos := rl.GetScreenToWorld2D(rl.Vector2{X: float32(math.Round(float64(rl.GetMouseX()))), Y: float32(float64(rl.GetMouseY()))}, (*g.Camera))
 
-		_, obj, err := g.Generator.ObjectManager.GetObjectAtWorldPosition(worldPos)
+			distanceX := math.Round(float64(worldPos.X - g.CurrentPlayer.Position.X))
+			distanceY := math.Round(float64(worldPos.Y - g.CurrentPlayer.Position.Y))
 
-		if err != nil {
-			return
-		}
+			_, obj, err := g.Generator.ObjectManager.GetObjectAtWorldPosition(worldPos)
 
-		activeHotbarSlotItem, _ := utils.GetItemByItemId(g.PlayerInventory.Hotbar[g.PlayerInventory.SelectedHotbarSlot])
+			if err != nil {
+				return
+			}
 
-		if obj.Mineable {
-			if g.PlayerInventory.Hotbar[g.PlayerInventory.SelectedHotbarSlot] == 0 {
-				if obj.Level == utils.ML_LOW {
-					err = g.Generator.ObjectManager.DamageObject(obj.Id, 1)
+			minInteractDistance := float64(g.Generator.CellSize) * 2
+			activeHotbarSlotItem, _ := utils.GetItemByItemId(g.PlayerInventory.Hotbar[g.PlayerInventory.SelectedHotbarSlot])
 
-					if err != nil {
-						fmt.Println(err)
-						return
+			if ((distanceX > 0 && distanceX <= minInteractDistance) || (distanceX < 0 && distanceX >= minInteractDistance)) ||
+				((distanceY > 0 && distanceY <= minInteractDistance) || (distanceY < 0 && distanceY >= minInteractDistance)) {
+				if obj.Mineable {
+					if g.PlayerInventory.Hotbar[g.PlayerInventory.SelectedHotbarSlot] == 0 {
+						if obj.Level == utils.ML_LOW {
+							err = g.Generator.ObjectManager.DamageObject(obj.Id, 1)
+
+							if err != nil {
+								fmt.Println(err)
+								return
+							}
+						}
+					} else if activeHotbarSlotItem.MineLevel >= obj.Level {
+						err = g.Generator.ObjectManager.DamageObject(obj.Id, activeHotbarSlotItem.MineDamage)
+
+						if err != nil {
+							fmt.Println(err)
+							return
+						}
 					}
-				}
-			} else if activeHotbarSlotItem.MineLevel >= obj.Level {
-				err = g.Generator.ObjectManager.DamageObject(obj.Id, activeHotbarSlotItem.MineDamage)
-
-				if err != nil {
-					fmt.Println(err)
-					return
 				}
 			}
 		}
-
 	}
 }
 

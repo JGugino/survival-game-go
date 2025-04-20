@@ -62,7 +62,7 @@ type Inventory struct {
 	}
 }
 
-var transparentWhite rl.Color = rl.Color{R: 255, G: 255, B: 255, A: 230}
+var transparentWhite rl.Color = rl.Color{R: 255, G: 255, B: 255, A: 245}
 
 func (i *Inventory) InitInventory() {
 	i.CraftingHandler.InitCraftingRecipes()

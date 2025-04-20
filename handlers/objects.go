@@ -38,6 +38,7 @@ func (o *Objects) CreateNewObject(object ObjectId, position rl.Vector2, health i
 		ObjectId:    int(object),
 		Position:    position,
 		Health:      health,
+		MaxHealth:   health,
 		Color:       color,
 		Movable:     movable,
 		Mineable:    mineable,
@@ -106,14 +107,30 @@ func (o *Objects) DrawObjects(x int, y int, camera *rl.Camera2D) {
 	if err != nil {
 		return
 	}
-	switch tile {
-	case 1: //Rock
-		tMap.DrawTextureAtPositionWithScaling(rl.Vector2Zero(), objectLocation, o.CellSize)
-		break
-	case 2: //Bush
-		tMap.DrawTextureAtPositionWithScaling(rl.Vector2{X: 1, Y: 0}, objectLocation, o.CellSize)
-		break
+
+	if tile != 0 {
+
+		_, obj, err := o.GetObjectAtWorldPosition(objectLocation)
+
+		if err != nil {
+			return
+		}
+
+		if obj.Health < obj.MaxHealth {
+			rl.DrawRectangle(int32(objectLocation.X), int32(objectLocation.Y), int32(o.CellSize), 5, rl.White)
+			rl.DrawRectangle(int32(objectLocation.X), int32(objectLocation.Y), int32(o.CellSize*obj.Health/obj.MaxHealth), 5, rl.Red)
+		}
+
+		switch tile {
+		case 1: //Rock
+			tMap.DrawTextureAtPositionWithScaling(rl.Vector2Zero(), objectLocation, o.CellSize)
+			break
+		case 2: //Bush
+			tMap.DrawTextureAtPositionWithScaling(rl.Vector2{X: 1, Y: 0}, objectLocation, o.CellSize)
+			break
+		}
 	}
+
 }
 
 func (o *Objects) DrawObjectGridToConsole() {
