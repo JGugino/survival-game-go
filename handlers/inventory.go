@@ -36,6 +36,13 @@ type Inventory struct {
 	HotbarSize            int
 	MainInventory         Container
 	Hotbar                [9]utils.ItemId
+	HelmetSlot            utils.ItemId
+	ChestplateSlot        utils.ItemId
+	LeggingSlot           utils.ItemId
+	BootSlot              utils.ItemId
+	RingSlot              utils.ItemId
+	NecklaceSlot          utils.ItemId
+	CharmSlot             utils.ItemId
 	CellSize              int
 	SelectedHotbarSlot    int
 	Visible               bool
@@ -76,6 +83,26 @@ func (i *Inventory) DrawInventory() {
 		return
 	}
 
+	//Helmet Slot
+	rl.DrawRectangleLines(int32(offsetX+5), int32(offsetY)-10, int32(i.CellSize), int32(i.CellSize), rl.Black)
+
+	//Chestplate Slot
+	rl.DrawRectangleLines(int32(offsetX+5), int32(offsetY)+int32(i.CellSize)+20, int32(i.CellSize), int32(i.CellSize), rl.Black)
+
+	//Legging Slot
+	rl.DrawRectangleLines(int32(offsetX+15+i.CellSize), int32(offsetY)-10, int32(i.CellSize), int32(i.CellSize), rl.Black)
+
+	//Boot Slot
+	rl.DrawRectangleLines(int32(offsetX+15+i.CellSize), int32(offsetY)+int32(i.CellSize)+20, int32(i.CellSize), int32(i.CellSize), rl.Black)
+
+	//Ring Slot
+	rl.DrawRectangleLines(int32(offsetX+25+(i.CellSize*2)), int32(offsetY)-10, int32(i.CellSize), int32(i.CellSize), rl.Black)
+
+	//Necklace Slot
+	rl.DrawRectangleLines(int32(offsetX+25+(i.CellSize*2)), int32(offsetY)+int32(i.CellSize)+20, int32(i.CellSize), int32(i.CellSize), rl.Black)
+
+	//Charm Slot
+	rl.DrawRectangleLines(int32(offsetX+35+(i.CellSize*3)), int32(offsetY)-10, int32(i.CellSize), int32(i.CellSize), rl.Black)
 	for y := range i.MainInventory.Height {
 		for x := range i.MainInventory.Width {
 			slotXOffset := int32(x*i.CellSize + offsetX + i.Positioning.InventoryCellXOffset)
@@ -538,7 +565,6 @@ func (i *Inventory) CraftItem(recipeId string) error {
 		for x, r := range recipe.RecipeItems {
 			if foundStacks[x].ItemId == r.Id {
 				utils.RemoveItemsFromStack(foundStacks[x], r.Quantity)
-
 				if foundStacks[x].StackSize <= 0 {
 					i.MainInventory.ItemGrid[int32(foundStacks[x].InventorySlot.X)][int32(foundStacks[x].InventorySlot.Y)] = 0
 					utils.DeleteItemStack(foundStacks[x].Id)

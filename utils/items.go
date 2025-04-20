@@ -17,9 +17,16 @@ type MineLevel int16
 
 const (
 	//Stack Locations
-	SL_HOTBAR    StackLocation = 0
-	SL_INVENTORY StackLocation = 1
-	SL_WORLD     StackLocation = 2
+	SL_HOTBAR     StackLocation = 0
+	SL_INVENTORY  StackLocation = 1
+	SL_WORLD      StackLocation = 2
+	SL_HELMET     StackLocation = 3
+	SL_CHESTPLATE StackLocation = 4
+	SL_LEGGING    StackLocation = 5
+	SL_BOOT       StackLocation = 6
+	SL_RING       StackLocation = 7
+	SL_NECKLACE   StackLocation = 8
+	SL_CHARM      StackLocation = 9
 
 	//Item Ids
 	I_ROCK    ItemId = 1

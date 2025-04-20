@@ -80,9 +80,9 @@ func main() {
 		Positioning: handlers.InventoryPosition{
 			InventoryYOffset:     40,
 			InventoryXPadding:    10,
-			InventoryYPadding:    100,
+			InventoryYPadding:    200,
 			InventoryCellXOffset: 5,
-			InventoryCellYOffset: 50,
+			InventoryCellYOffset: 130,
 			HotbarYOffset:        10,
 			HotbarXOffset:        10,
 			HotbarXPadding:       10,
