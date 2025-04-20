@@ -62,7 +62,7 @@ type Inventory struct {
 	}
 }
 
-var transparentWhite rl.Color = rl.Color{R: 255, G: 255, B: 255, A: 245}
+var transparentLightGray rl.Color = rl.Color{R: 220, G: 220, B: 220, A: 245}
 
 func (i *Inventory) InitInventory() {
 	i.CraftingHandler.InitCraftingRecipes()
@@ -75,7 +75,7 @@ func (i *Inventory) DrawInventory() {
 	offsetY := (rl.GetScreenHeight() - i.MainInventory.ScreenHeight) / 2
 
 	// Inventory background
-	rl.DrawRectangleRounded(rl.Rectangle{X: float32(offsetX), Y: float32(offsetY - i.Positioning.InventoryYOffset), Width: float32(i.MainInventory.ScreenWidth + i.Positioning.InventoryXPadding), Height: float32(i.MainInventory.ScreenHeight + i.Positioning.InventoryYPadding)}, 0.1, 1, transparentWhite)
+	rl.DrawRectangleRounded(rl.Rectangle{X: float32(offsetX), Y: float32(offsetY - i.Positioning.InventoryYOffset), Width: float32(i.MainInventory.ScreenWidth + i.Positioning.InventoryXPadding), Height: float32(i.MainInventory.ScreenHeight + i.Positioning.InventoryYPadding)}, 0.1, 1, transparentLightGray)
 
 	tMap, err := utils.GetTextureMap("items")
 
@@ -143,7 +143,7 @@ func (i *Inventory) DrawInventory() {
 
 func (i *Inventory) DrawHotbar() {
 	// Hotbar background
-	rl.DrawRectangleRounded(rl.Rectangle{X: float32(i.Positioning.HotbarXOffset), Y: float32(i.Positioning.HotbarYOffset), Width: float32(i.HotbarSize)*float32(i.CellSize) + float32(i.Positioning.HotbarXPadding), Height: float32(i.CellSize) + float32(i.Positioning.HotbarYPadding)}, 0.1, 1, transparentWhite)
+	rl.DrawRectangleRounded(rl.Rectangle{X: float32(i.Positioning.HotbarXOffset), Y: float32(i.Positioning.HotbarYOffset), Width: float32(i.HotbarSize)*float32(i.CellSize) + float32(i.Positioning.HotbarXPadding), Height: float32(i.CellSize) + float32(i.Positioning.HotbarYPadding)}, 0.1, 1, transparentLightGray)
 
 	tMap, err := utils.GetTextureMap("items")
 

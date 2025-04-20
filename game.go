@@ -58,6 +58,8 @@ func (g *Game) HandleInput() {
 	}
 
 	if rl.IsMouseButtonPressed(rl.MouseButtonLeft) {
+		g.CurrentPlayer.Health -= 1
+
 		if !g.PlayerInventory.Visible {
 			worldPos := rl.GetScreenToWorld2D(rl.Vector2{X: float32(math.Round(float64(rl.GetMouseX()))), Y: float32(float64(rl.GetMouseY()))}, (*g.Camera))
 
@@ -153,6 +155,13 @@ func (g *Game) Draw() {
 	if g.PlayerInventory.Visible {
 		g.PlayerInventory.DrawInventory()
 	}
+
+	var healthBarWidth int32 = 200
+	var healthBarHeight int32 = 40
+
+	rl.DrawRectangle(10, WINDOW_HEIGHT-50, healthBarWidth, healthBarHeight, rl.White)
+	rl.DrawRectangle(10, WINDOW_HEIGHT-50, healthBarWidth*int32(g.CurrentPlayer.Health)/int32(g.CurrentPlayer.MaxHealth), healthBarHeight, rl.Red)
+	rl.DrawText("Health", 20, WINDOW_HEIGHT-40, 20, rl.Black)
 
 	g.PlayerInventory.DrawHoldingItem()
 

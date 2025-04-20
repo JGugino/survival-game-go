@@ -8,6 +8,7 @@ import (
 type Player struct {
 	Position  rl.Vector2
 	Health    int
+	MaxHealth int
 	Speed     float32
 	Width     int
 	Height    int
@@ -73,7 +74,6 @@ func (p *Player) Draw() {
 	} else if p.Direction == utils.RIGHT {
 		tMap.DrawTextureAtPositionWithScaling(rl.Vector2{X: 3, Y: 0}, position, p.Width)
 	}
-
 }
 
 func (p *Player) MoveToWorldPosition(position rl.Vector2) {

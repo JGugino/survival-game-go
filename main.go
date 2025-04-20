@@ -44,6 +44,7 @@ func main() {
 	player := entities.Player{
 		Position:  rl.Vector2{X: worldGenerator.SpawnPoint.X, Y: worldGenerator.SpawnPoint.Y},
 		Health:    100,
+		MaxHealth: 100,
 		Speed:     2,
 		Width:     DEFAULT_CELL_SIZE,
 		Height:    DEFAULT_CELL_SIZE,
