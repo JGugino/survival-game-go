@@ -47,7 +47,7 @@ func main() {
 		Speed:     2,
 		Width:     DEFAULT_CELL_SIZE,
 		Height:    DEFAULT_CELL_SIZE,
-		Direction: utils.UP,
+		Direction: utils.DOWN,
 		Moving:    false}
 
 	mainCamera := rl.Camera2D{

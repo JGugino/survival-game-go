@@ -95,7 +95,7 @@ func (i *Inventory) DrawInventory() {
 					return
 				}
 
-				itemPosition := rl.Vector2{X: float32(slotXOffset + int32(i.CellSize)/2), Y: float32(slotYOffset + int32(i.CellSize)/2)}
+				itemPosition := rl.Vector2{X: float32(slotXOffset), Y: float32(slotYOffset)}
 
 				tMap.DrawTextureAtPositionWithScaling(slotItem.Texture.TexturePosition, itemPosition, slotItem.Texture.ContainerDrawSize)
 				//Item stack quantity text
@@ -136,7 +136,7 @@ func (i *Inventory) DrawHotbar() {
 
 			_, stack, err := utils.GetItemStackAtInventorySlot(rl.Vector2{X: float32(x), Y: float32(0)}, utils.SL_HOTBAR)
 
-			itemPosition := rl.Vector2{X: float32(slotXOffset + int32(i.CellSize)/2), Y: float32(slotYOffset + int32(i.CellSize)/2)}
+			itemPosition := rl.Vector2{X: float32(slotXOffset), Y: float32(slotYOffset)}
 
 			tMap.DrawTextureAtPositionWithScaling(slotItem.Texture.TexturePosition, itemPosition, slotItem.Texture.ContainerDrawSize)
 
@@ -165,6 +165,20 @@ func (i *Inventory) DrawHoldingItem() {
 		itemPosition := rl.Vector2{X: float32(rl.GetMouseX()), Y: float32(rl.GetMouseY())}
 
 		tMap.DrawTextureAtPositionWithScaling(item.Texture.TexturePosition, itemPosition, item.Texture.ContainerDrawSize)
+	}
+}
+
+func (i *Inventory) DrawSelectedHotbarItem(drawPosition rl.Vector2) {
+	if i.Hotbar[i.SelectedHotbarSlot] != 0 {
+		item, err := utils.GetItemByItemId(i.Hotbar[i.SelectedHotbarSlot])
+
+		if err != nil {
+			return
+		}
+
+		tMap, err := utils.GetTextureMap("items")
+
+		tMap.DrawTextureAtPositionWithScaling(item.Texture.TexturePosition, drawPosition, item.Texture.WorldDrawSize-item.Texture.WorldDrawSize/3)
 	}
 }
 

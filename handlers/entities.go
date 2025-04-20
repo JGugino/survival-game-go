@@ -15,7 +15,6 @@ type Entity interface {
 type ActiveEntity struct {
 	Id         uuid.UUID
 	EntityData *utils.EntityData
-	Entity     *Entity
 }
 
 type Entities struct {

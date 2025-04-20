@@ -48,13 +48,25 @@ func (g *WorldGenerator) InitWorldGrid() {
 				}
 			}
 
-			g.WorldGrid[x][y] = int(tileType)
+			if tileType == GRASS {
+				test := rl.GetRandomValue(0, 20)
+				if test > 18 {
+					wood, err := utils.GetItemByName("wood")
 
+					if err != nil {
+						return
+					}
+
+					g.ObjectManager.CreateNewObject(BUSH, rl.Vector2{X: float32(x), Y: float32(y)}, 20, rl.DarkGray, false, true, utils.ML_LOW, *wood)
+				}
+			}
+
+			g.WorldGrid[x][y] = int(tileType)
 		}
 	}
 }
 
-func (g *WorldGenerator) DrawWorld() {
+func (g *WorldGenerator) DrawWorld(camera *rl.Camera2D, inventoryVisible *bool) {
 	tMap, err := utils.GetTextureMap("world-tiles")
 
 	if err != nil {
@@ -88,7 +100,20 @@ func (g *WorldGenerator) DrawWorld() {
 			}
 
 			//Draw object tiles
-			g.ObjectManager.DrawObjects(x, y)
+			g.ObjectManager.DrawObjects(x, y, camera)
+
+			//Draws outline around tile that is being hovered over by the mouse, doesn't show if inventory is open
+			if !*inventoryVisible {
+				worldPos := rl.GetScreenToWorld2D(rl.Vector2{X: float32(rl.GetMouseX()), Y: float32(rl.GetMouseY())}, (*camera))
+
+				if int32(worldPos.X) >= int32(cellPosition.X) && int32(worldPos.X) <= int32(cellPosition.X)+int32(g.CellSize) {
+					if int32(worldPos.Y) >= int32(cellPosition.Y) && int32(worldPos.Y) <= int32(cellPosition.Y)+int32(g.CellSize) {
+						rect := rl.Rectangle{X: cellPosition.X, Y: cellPosition.Y, Width: float32(g.CellSize), Height: float32(g.CellSize)}
+						rl.DrawRectangleLinesEx(rect, 2, rl.Black)
+					}
+				}
+			}
+
 		}
 	}
 }
@@ -98,7 +123,6 @@ func (g *WorldGenerator) DrawWorldToConsole() {
 	for y := range g.MapHeight {
 		for x := range g.MapWidth {
 			tile := g.WorldGrid[x][y]
-
 			fmt.Print(tile)
 		}
 		fmt.Print("\n")

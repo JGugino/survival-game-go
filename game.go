@@ -63,14 +63,20 @@ func (g *Game) HandleInput() {
 			return
 		}
 
-		activeHotbarSlotItem, err := utils.GetItemByItemId(g.PlayerInventory.Hotbar[g.PlayerInventory.SelectedHotbarSlot])
-
-		if err != nil {
-			return
-		}
+		activeHotbarSlotItem, _ := utils.GetItemByItemId(g.PlayerInventory.Hotbar[g.PlayerInventory.SelectedHotbarSlot])
 
 		if obj.Mineable {
-			if activeHotbarSlotItem.MineLevel >= obj.Level {
+			if g.PlayerInventory.Hotbar[g.PlayerInventory.SelectedHotbarSlot] == 0 {
+				if obj.Level == utils.ML_LOW {
+					err = g.Generator.ObjectManager.DamageObject(obj.Id, 1)
+
+					if err != nil {
+						fmt.Print("Slot Empty - ")
+						fmt.Println(err)
+						return
+					}
+				}
+			} else if activeHotbarSlotItem.MineLevel >= obj.Level {
 				err = g.Generator.ObjectManager.DamageObject(obj.Id, activeHotbarSlotItem.MineDamage)
 
 				if err != nil {
@@ -123,8 +129,11 @@ func (g *Game) Draw() {
 
 	rl.BeginMode2D(*g.Camera)
 
-	g.Generator.DrawWorld()
+	g.Generator.DrawWorld(g.Camera, &g.PlayerInventory.Visible)
 	g.CurrentPlayer.Draw()
+
+	g.PlayerInventory.DrawSelectedHotbarItem(g.CurrentPlayer.Position)
+
 	utils.DrawWorldItems()
 
 	rl.EndMode2D()

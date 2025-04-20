@@ -12,7 +12,7 @@ const (
 	//Object Id's
 	EMPTY ObjectId = 0
 	ROCK  ObjectId = 1
-	TREE  ObjectId = 2
+	BUSH  ObjectId = 2
 )
 
 type Object struct {

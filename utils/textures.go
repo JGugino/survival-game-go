@@ -27,7 +27,7 @@ func (t *TextureMap) DrawTextureAtPosition(texturePosition rl.Vector2, drawLocat
 }
 func (t *TextureMap) DrawTextureAtPositionWithScalingPro(texturePosition rl.Vector2, drawLocation rl.Vector2, drawWidth, drawHeight int) {
 	textureSelectRect := rl.Rectangle{X: float32(int(texturePosition.X) * t.TextureSize), Y: float32(int(texturePosition.Y) * t.TextureSize), Width: float32(t.TextureSize), Height: float32(t.TextureSize)}
-	textureDrawRect := rl.Rectangle{X: drawLocation.X, Y: drawLocation.Y, Width: float32(drawWidth), Height: float32(drawHeight)}
+	textureDrawRect := rl.Rectangle{X: drawLocation.X + float32(drawWidth)/2, Y: drawLocation.Y + float32(drawHeight)/2, Width: float32(drawWidth), Height: float32(drawHeight)}
 
 	//rl.SetTextureFilter(t.Texture, rl.FilterPoint)
 	rl.DrawTexturePro(t.Texture, textureSelectRect, textureDrawRect, rl.Vector2{X: float32(drawWidth) / 2, Y: float32(drawHeight) / 2}, 0, rl.White)
@@ -35,7 +35,7 @@ func (t *TextureMap) DrawTextureAtPositionWithScalingPro(texturePosition rl.Vect
 }
 func (t *TextureMap) DrawTextureAtPositionWithScaling(texturePosition rl.Vector2, drawLocation rl.Vector2, drawSize int) {
 	textureSelectRect := rl.Rectangle{X: float32(int(texturePosition.X) * t.TextureSize), Y: float32(int(texturePosition.Y) * t.TextureSize), Width: float32(t.TextureSize), Height: float32(t.TextureSize)}
-	textureDrawRect := rl.Rectangle{X: drawLocation.X, Y: drawLocation.Y, Width: float32(drawSize), Height: float32(drawSize)}
+	textureDrawRect := rl.Rectangle{X: drawLocation.X + float32(drawSize)/2, Y: drawLocation.Y + float32(drawSize)/2, Width: float32(drawSize), Height: float32(drawSize)}
 
 	//rl.SetTextureFilter(t.Texture, rl.FilterAnisotropic16x)
 	rl.DrawTexturePro(t.Texture, textureSelectRect, textureDrawRect, rl.Vector2{X: float32(drawSize) / 2, Y: float32(drawSize) / 2}, 0, rl.White)

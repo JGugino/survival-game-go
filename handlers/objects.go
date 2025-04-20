@@ -96,7 +96,7 @@ func (o *Objects) GetObjectAtWorldPosition(position rl.Vector2) (uuid.UUID, *Obj
 	return uuid.UUID{}, &Object{}, errors.New("no-object")
 }
 
-func (o *Objects) DrawObjects(x int, y int) {
+func (o *Objects) DrawObjects(x int, y int, camera *rl.Camera2D) {
 	tile := o.ObjectGrid[x][y]
 
 	tMap, err := utils.GetTextureMap("world-objects")
@@ -106,12 +106,12 @@ func (o *Objects) DrawObjects(x int, y int) {
 	if err != nil {
 		return
 	}
-
 	switch tile {
 	case 1: //Rock
 		tMap.DrawTextureAtPositionWithScaling(rl.Vector2Zero(), objectLocation, o.CellSize)
 		break
-	case 2: //Tree
+	case 2: //Bush
+		tMap.DrawTextureAtPositionWithScaling(rl.Vector2{X: 1, Y: 0}, objectLocation, o.CellSize)
 		break
 	}
 }

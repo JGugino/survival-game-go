@@ -27,6 +27,7 @@ const (
 	I_SEEDS   ItemId = 3
 	I_TORCH   ItemId = 4
 	I_PICKAXE ItemId = 5
+	I_WOOD    ItemId = 6
 
 	//Item Type
 	ITEM   ItemType = 0
@@ -68,10 +69,76 @@ var itemStacks map[uuid.UUID]*ItemStack = make(map[uuid.UUID]*ItemStack, 0)
 var itemMap map[string]*Item = make(map[string]*Item, 0)
 
 func InitItemMap() {
-	itemMap["rock"] = &Item{Id: I_ROCK, Name: "Rock", Type: ITEM, MaxStack: 10, MineLevel: ML_LOW, MineDamage: 1, Texture: TextureIdentifier{TextureMapId: "items", TexturePosition: rl.Vector2{X: 0, Y: 0}, ContainerDrawSize: 40, WorldDrawSize: 36}}
-	itemMap["pickaxe"] = &Item{Id: I_PICKAXE, Name: "Pickaxe", Type: WEAPON, MaxStack: 1, MineLevel: ML_MED, MineDamage: 10, Texture: TextureIdentifier{TextureMapId: "items", TexturePosition: rl.Vector2{X: 1, Y: 0}, ContainerDrawSize: 40, WorldDrawSize: 36}}
-	itemMap["torch"] = &Item{Id: I_TORCH, Name: "Torch", Type: ITEM, MaxStack: 50, MineLevel: ML_LOW, MineDamage: 1, Texture: TextureIdentifier{TextureMapId: "items", TexturePosition: rl.Vector2{X: 2, Y: 0}, ContainerDrawSize: 40, WorldDrawSize: 36}}
-	itemMap["seeds"] = &Item{Id: I_SEEDS, Name: "Seeds", Type: ITEM, MaxStack: 50, MineLevel: ML_LOW, MineDamage: 1, Texture: TextureIdentifier{TextureMapId: "items", TexturePosition: rl.Vector2{X: 3, Y: 0}, ContainerDrawSize: 40, WorldDrawSize: 36}}
+	itemMap["rock"] = &Item{
+		Id:         I_ROCK,
+		Name:       "Rock",
+		Type:       ITEM,
+		MaxStack:   100,
+		MineLevel:  ML_LOW,
+		MineDamage: 1,
+		Texture: TextureIdentifier{
+			TextureMapId:      "items",
+			TexturePosition:   rl.Vector2{X: 0, Y: 0},
+			ContainerDrawSize: 40,
+			WorldDrawSize:     36,
+		},
+	}
+	itemMap["pickaxe"] = &Item{
+		Id:         I_PICKAXE,
+		Name:       "Pickaxe",
+		Type:       WEAPON,
+		MaxStack:   1,
+		MineLevel:  ML_MED,
+		MineDamage: 10,
+		Texture: TextureIdentifier{
+			TextureMapId:      "items",
+			TexturePosition:   rl.Vector2{X: 1, Y: 0},
+			ContainerDrawSize: 40,
+			WorldDrawSize:     36,
+		},
+	}
+	itemMap["torch"] = &Item{
+		Id:         I_TORCH,
+		Name:       "Torch",
+		Type:       ITEM,
+		MaxStack:   50,
+		MineLevel:  ML_LOW,
+		MineDamage: 1,
+		Texture: TextureIdentifier{
+			TextureMapId:      "items",
+			TexturePosition:   rl.Vector2{X: 2, Y: 0},
+			ContainerDrawSize: 40,
+			WorldDrawSize:     36,
+		},
+	}
+	itemMap["seeds"] = &Item{
+		Id:         I_SEEDS,
+		Name:       "Seeds",
+		Type:       ITEM,
+		MaxStack:   50,
+		MineLevel:  ML_LOW,
+		MineDamage: 1,
+		Texture: TextureIdentifier{
+			TextureMapId:      "items",
+			TexturePosition:   rl.Vector2{X: 3, Y: 0},
+			ContainerDrawSize: 40,
+			WorldDrawSize:     36,
+		},
+	}
+	itemMap["wood"] = &Item{
+		Id:         I_WOOD,
+		Name:       "Wood",
+		Type:       ITEM,
+		MaxStack:   50,
+		MineLevel:  ML_LOW,
+		MineDamage: 1,
+		Texture: TextureIdentifier{
+			TextureMapId:      "items",
+			TexturePosition:   rl.Vector2{X: 4, Y: 0},
+			ContainerDrawSize: 40,
+			WorldDrawSize:     38,
+		},
+	}
 }
 
 func GetItemByName(name string) (*Item, error) {
@@ -96,6 +163,8 @@ func GetItemByItemId(itemId ItemId) (*Item, error) {
 		return itemMap["torch"], nil
 	case I_PICKAXE:
 		return itemMap["pickaxe"], nil
+	case I_WOOD:
+		return itemMap["wood"], nil
 	default:
 		return &Item{}, errors.New("no-item")
 	}
