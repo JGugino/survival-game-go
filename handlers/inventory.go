@@ -32,6 +32,7 @@ type InventoryPosition struct {
 }
 
 type Inventory struct {
+	CraftingHandler       *Crafting
 	HotbarSize            int
 	MainInventory         Container
 	Hotbar                [9]utils.ItemId
@@ -55,6 +56,12 @@ type Inventory struct {
 }
 
 var transparentWhite rl.Color = rl.Color{R: 255, G: 255, B: 255, A: 230}
+
+func (i *Inventory) InitInventory() {
+	i.CraftingHandler.InitCraftingRecipes()
+	i.ClearHotbar()
+	i.ClearInventory()
+}
 
 func (i *Inventory) DrawInventory() {
 	offsetX := (rl.GetScreenWidth() - i.MainInventory.ScreenWidth) / 2

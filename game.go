@@ -33,9 +33,8 @@ func (g *Game) Init() {
 	g.Generator.InitWorldGrid()
 	g.Generator.SelectValidSpawnPoint()
 
-	//Clears the inventory and hotbar grids to all zeros
-	g.PlayerInventory.ClearInventory()
-	g.PlayerInventory.ClearHotbar()
+	//Initalizes the inventory and hotbar to an empty state, also inits crafting recipes
+	g.PlayerInventory.InitInventory()
 
 	//Moves the player to the world's spawn point
 	g.CurrentPlayer.MoveToWorldPosition(g.Generator.SpawnPoint)
@@ -54,6 +53,20 @@ func (g *Game) HandleInput() {
 	g.PlayerInventory.InputHandler()
 	g.DebugPanel.HandleInput()
 
+	if rl.IsKeyPressed(rl.KeyP) {
+		canCraft, missingItems, err := g.PlayerInventory.CraftingHandler.CanCraftItem("pickaxe")
+
+		if err != nil {
+			fmt.Print("Missing items: ")
+			fmt.Println(missingItems)
+			return
+		}
+
+		if canCraft {
+			g.PlayerInventory.AddItemToInventory(utils.I_PICKAXE)
+		}
+	}
+
 	if rl.IsMouseButtonPressed(rl.MouseButtonLeft) {
 		worldPos := rl.GetScreenToWorld2D(rl.Vector2{X: float32(math.Round(float64(rl.GetMouseX()))), Y: float32(float64(rl.GetMouseY()))}, (*g.Camera))
 
@@ -71,7 +84,6 @@ func (g *Game) HandleInput() {
 					err = g.Generator.ObjectManager.DamageObject(obj.Id, 1)
 
 					if err != nil {
-						fmt.Print("Slot Empty - ")
 						fmt.Println(err)
 						return
 					}

@@ -262,6 +262,16 @@ func GetItemStackAtInventorySlot(slot rl.Vector2, section StackLocation) (uuid.U
 	return uuid.UUID{}, &ItemStack{}, errors.New("no-stack-at-slot")
 }
 
+func GetItemStackByItemId(itemId ItemId) (uuid.UUID, *ItemStack, error) {
+	for id, stack := range itemStacks {
+		if stack.ItemId == itemId {
+			return id, stack, nil
+		}
+	}
+
+	return uuid.UUID{}, &ItemStack{}, errors.New("no-item-stack")
+}
+
 func DrawItemStacksToConsole() {
 	fmt.Println("###START ITEM STACKS")
 	for _, i := range itemStacks {

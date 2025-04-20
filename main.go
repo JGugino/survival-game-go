@@ -58,6 +58,9 @@ func main() {
 	}
 
 	inv := handlers.Inventory{
+		CraftingHandler: &handlers.Crafting{
+			CraftingRecipes: make(map[string]handlers.CraftingRecipe, 0),
+		},
 		HotbarSize:         9,
 		CellSize:           DEFAULT_CELL_SIZE,
 		Visible:            false,
