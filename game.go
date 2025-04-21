@@ -16,14 +16,18 @@ type Game struct {
 	CurrentPlayer   *entities.Player
 	PlayerInventory *handlers.Inventory
 	DebugPanel      *handlers.Debug
+	Lighting        rl.Shader
 }
 
 func (g *Game) Init() {
 	//Load Textures
-	utils.LoadNewTextureMap("world-tiles", "assets/world_tiles.png", 16)
-	utils.LoadNewTextureMap("world-objects", "assets/world_objects.png", 16)
-	utils.LoadNewTextureMap("items", "assets/items.png", 16)
-	utils.LoadNewTextureMap("player", "assets/player.png", 16)
+	utils.LoadNewTextureMap("world-tiles", "assets/textures/world_tiles.png", 16)
+	utils.LoadNewTextureMap("world-objects", "assets/textures/world_objects.png", 16)
+	utils.LoadNewTextureMap("items", "assets/textures/items.png", 16)
+	utils.LoadNewTextureMap("player", "assets/textures/player.png", 16)
+
+	//TODO: Work on adding lighting shaders
+	//g.Lighting = rl.LoadShader("assets/shaders/lighting.vert", "assets/shaders/lighting.frag")
 
 	//Initialize all game items
 	utils.InitItemMap()
@@ -38,10 +42,15 @@ func (g *Game) Init() {
 
 	//Moves the player to the world's spawn point
 	g.CurrentPlayer.MoveToWorldPosition(g.Generator.SpawnPoint)
+
+	g.CurrentPlayer.Init()
+
+	g.PlayerInventory.AddItemToHotbar(0, utils.I_PICKAXE)
 }
 
 func (g *Game) CleanUp() {
 	utils.UnloadTextureMaps()
+	rl.UnloadShader(g.Lighting)
 }
 
 func (g *Game) HandleInput() {
@@ -58,8 +67,6 @@ func (g *Game) HandleInput() {
 	}
 
 	if rl.IsMouseButtonPressed(rl.MouseButtonLeft) {
-		g.CurrentPlayer.Health -= 1
-
 		if !g.PlayerInventory.Visible {
 			worldPos := rl.GetScreenToWorld2D(rl.Vector2{X: float32(math.Round(float64(rl.GetMouseX()))), Y: float32(float64(rl.GetMouseY()))}, (*g.Camera))
 
@@ -80,7 +87,7 @@ func (g *Game) HandleInput() {
 				if obj.Mineable {
 					if g.PlayerInventory.Hotbar[g.PlayerInventory.SelectedHotbarSlot] == 0 {
 						if obj.Level == utils.ML_LOW {
-							err = g.Generator.ObjectManager.DamageObject(obj.Id, 1)
+							err = g.Generator.ObjectManager.DamageObject(obj.Id, 10)
 
 							if err != nil {
 								fmt.Println(err)
@@ -139,16 +146,25 @@ func (g *Game) Update() {
 
 func (g *Game) Draw() {
 
+	//###WORLD DRAWING###
 	rl.BeginMode2D(*g.Camera)
 
 	g.Generator.DrawWorld(g.Camera, &g.PlayerInventory.Visible)
 	g.CurrentPlayer.Draw()
 
-	g.PlayerInventory.DrawSelectedHotbarItem(g.CurrentPlayer.Position)
+	if g.CurrentPlayer.Direction == utils.DOWN {
+		g.PlayerInventory.DrawSelectedHotbarItem(g.CurrentPlayer.HoldingLocations.ForwardHold)
+	} else if g.CurrentPlayer.Direction == utils.LEFT {
+		g.PlayerInventory.DrawSelectedHotbarItem(g.CurrentPlayer.HoldingLocations.LeftHold)
+	} else if g.CurrentPlayer.Direction == utils.RIGHT {
+		g.PlayerInventory.DrawSelectedHotbarItem(g.CurrentPlayer.HoldingLocations.RightHold)
+	}
 
 	utils.DrawWorldItems()
 
 	rl.EndMode2D()
+
+	//###UI DRAWING###
 
 	g.PlayerInventory.DrawHotbar()
 
@@ -156,12 +172,10 @@ func (g *Game) Draw() {
 		g.PlayerInventory.DrawInventory()
 	}
 
-	var healthBarWidth int32 = 200
-	var healthBarHeight int32 = 40
-
-	rl.DrawRectangle(10, WINDOW_HEIGHT-50, healthBarWidth, healthBarHeight, rl.White)
-	rl.DrawRectangle(10, WINDOW_HEIGHT-50, healthBarWidth*int32(g.CurrentPlayer.Health)/int32(g.CurrentPlayer.MaxHealth), healthBarHeight, rl.Red)
-	rl.DrawText("Health", 20, WINDOW_HEIGHT-40, 20, rl.Black)
+	//Draw Player Health bar
+	barPosition := rl.Vector2{X: 10, Y: WINDOW_HEIGHT - 50}
+	textPosition := rl.Vector2{X: 20, Y: WINDOW_HEIGHT - 40}
+	g.CurrentPlayer.DrawHealthBar(barPosition, textPosition)
 
 	g.PlayerInventory.DrawHoldingItem()
 

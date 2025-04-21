@@ -111,7 +111,7 @@ func (g *WorldGenerator) DrawWorld(camera *rl.Camera2D, inventoryVisible *bool) 
 				if int32(worldPos.X) >= int32(cellPosition.X) && int32(worldPos.X) <= int32(cellPosition.X)+int32(g.CellSize) {
 					if int32(worldPos.Y) >= int32(cellPosition.Y) && int32(worldPos.Y) <= int32(cellPosition.Y)+int32(g.CellSize) {
 						rect := rl.Rectangle{X: cellPosition.X, Y: cellPosition.Y, Width: float32(g.CellSize), Height: float32(g.CellSize)}
-						rl.DrawRectangleLinesEx(rect, 2, rl.Black)
+						rl.DrawRectangleLinesEx(rect, 2, rl.Color{R: 40, G: 40, B: 40, A: 220})
 					}
 				}
 			}

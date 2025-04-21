@@ -29,6 +29,9 @@ func main() {
 
 	rl.SetTargetFPS(TARGET_FPS)
 
+	//TODO: Remove before production
+	rl.MinimizeWindow()
+
 	//TODO: Work on resizable window
 	//rl.SetWindowState(rl.FlagWindowResizable)
 
@@ -49,7 +52,13 @@ func main() {
 		Width:     DEFAULT_CELL_SIZE,
 		Height:    DEFAULT_CELL_SIZE,
 		Direction: utils.DOWN,
-		Moving:    false}
+		Moving:    false,
+		HoldingLocations: entities.HoldingLocations{
+			ForwardHold: rl.Vector2{X: DEFAULT_CELL_SIZE/2 + 5, Y: DEFAULT_CELL_SIZE / 2},
+			LeftHold:    rl.Vector2{X: DEFAULT_CELL_SIZE/2 + 5, Y: DEFAULT_CELL_SIZE / 2},
+			RightHold:   rl.Vector2{X: DEFAULT_CELL_SIZE/2 + 5, Y: DEFAULT_CELL_SIZE / 2},
+		},
+	}
 
 	mainCamera := rl.Camera2D{
 		Offset:   rl.Vector2{X: WINDOW_WIDTH / 2, Y: WINDOW_HEIGHT / 2},
